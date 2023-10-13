@@ -8,6 +8,7 @@ from apps.common.models import BaseModel
 from apps.common.utils import validate_file_size
 from apps.users.choices import UserRole, COUNTRY_CHOICES
 from apps.users.managers import CustomUserManager
+from apps.skills import models
 
 
 # Create your models here.
@@ -32,7 +33,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class UserProfile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
-    availability = models.ManyToManyField('')
+    availability = models.ManyToManyField(models.Availability)
     GENDER_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),
@@ -42,3 +43,27 @@ class UserProfile(BaseModel):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
     date_of_birth = models.DateField(null=True)
     country = models.CharField(max_length=5, choices=COUNTRY_CHOICES, default='CA')
+
+    skills = models.ManyToManyField(models.Skills)
+    time = models.ManyToManyField(models.Time)
+    days = models.ManyToManyField(models.Days)
+
+    has_work_permit = models.BooleanField(default=True)
+    workpermit_pr = models.FileField(upload_to='workpermitfile/')
+
+    first_aid_traninig = models.BooleanField(default=False)
+    first_aid_traninig_certificate = models.FileField(upload_to='first_aid_traninig_certificate')
+
+    cpr_traning = models.BooleanField(default=False)
+    cpr_traning_traninig_certificate = models.FileField(upload_to='cpr_traninig_certificate')
+
+    nanny_traninig = models.BooleanField(default=False)
+    nanny_traninig_traninig_certificate = models.FileField(upload_to='nanny_traninig_certificate')
+
+    elderly_care_traninig = models.BooleanField(default=False)
+    elderly_care_traninig_certificate = models.FileField(upload_to='elderly_care_traninig_certificate')
+
+    bio = models.TextField()
+
+
+

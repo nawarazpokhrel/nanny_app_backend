@@ -40,6 +40,7 @@ DEFAULT_APPS = [
 LOCAL_APPS = [
     'apps.users',
     'apps.common',
+    'apps.skills',
 ]
 
 THIRD_PARTY_APPS = []
