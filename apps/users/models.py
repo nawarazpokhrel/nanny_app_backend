@@ -32,7 +32,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class UserProfile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
-    availability = models.ManyToManyField('')
+    # availability = models.ManyToManyField('')
     GENDER_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),
