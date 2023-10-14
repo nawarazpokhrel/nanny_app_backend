@@ -1,7 +1,9 @@
 from django.contrib.auth import get_user_model
 
 from apps.common.usecases import BaseUseCase
-User=get_user_model()
+
+User = get_user_model()
+
 
 class CreateUserUseCase(BaseUseCase):
     def __init__(self, serializer):

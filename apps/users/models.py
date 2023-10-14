@@ -4,11 +4,12 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from apps.common.choices import UserRole, COUNTRY_CHOICES
 from apps.common.models import BaseModel
 from apps.common.utils import validate_file_size
-from apps.users.choices import UserRole, COUNTRY_CHOICES
+
+from apps.skills.models import Availability, Skills, Days, TimeSlot
 from apps.users.managers import CustomUserManager
-from apps.skills import models
 
 
 # Create your models here.
@@ -33,7 +34,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class UserProfile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
-    availability = models.ManyToManyField(models.Availability)
+    commitment_type = models.ManyToManyField(Availability)
     GENDER_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),
@@ -41,29 +42,42 @@ class UserProfile(BaseModel):
     )
 
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
-    date_of_birth = models.DateField(null=True)
+    date_of_birth = models.DateField(null=True, blank=True)
     country = models.CharField(max_length=5, choices=COUNTRY_CHOICES, default='CA')
+    address_line_1 = models.CharField(max_length=100, null=True, blank=True)
+    postal_code = models.CharField(max_length=100, null=True, blank=True)
 
-    skills = models.ManyToManyField(models.Skills)
-    time = models.ManyToManyField(models.Time)
-    days = models.ManyToManyField(models.Days)
+    skills = models.ManyToManyField(Skills)
 
     has_work_permit = models.BooleanField(default=True)
-    workpermit_pr = models.FileField(upload_to='workpermitfile/')
+    work_permit_pr = models.FileField(null=True, blank=True)
 
-    first_aid_traninig = models.BooleanField(default=False)
-    first_aid_traninig_certificate = models.FileField(upload_to='first_aid_traninig_certificate')
+    has_first_aid_training = models.BooleanField(default=False)
+    first_aid_training_certificate = models.FileField(null=True, blank=True)
 
-    cpr_traning = models.BooleanField(default=False)
-    cpr_traning_traninig_certificate = models.FileField(upload_to='cpr_traninig_certificate')
+    has_cpr_training = models.BooleanField(default=False)
+    cpr_training_certificate = models.FileField(null=True, blank=True)
 
-    nanny_traninig = models.BooleanField(default=False)
-    nanny_traninig_traninig_certificate = models.FileField(upload_to='nanny_traninig_certificate')
+    has_nanny_training = models.BooleanField(default=False)
+    nanny_training_certificate = models.FileField(null=True, blank=True)
 
-    elderly_care_traninig = models.BooleanField(default=False)
-    elderly_care_traninig_certificate = models.FileField(upload_to='elderly_care_traninig_certificate')
+    has_elderly_care_training = models.BooleanField(default=False)
+    elderly_care_training_certificate = models.FileField(null=True, blank=True)
 
-    bio = models.TextField()
+    bio = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.user.fullname
 
 
+class UserAvailability(BaseModel):
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    day = models.ForeignKey(Days, on_delete=models.CASCADE)
+    timeslots = models.ManyToManyField(TimeSlot)
 
+    class Meta:
+        unique_together = ('user_profile', 'day')
+
+    def __str__(self):
+        time_slots = ", ".join([slot.name for slot in self.timeslots.all()])
+        return f"{self.user_profile.user.fullname} -> {self.day.day_name} -> {time_slots}"
