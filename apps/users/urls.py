@@ -26,5 +26,6 @@ urlpatterns = [
         views.UserDetailView.as_view(),
         name='user-detail'
 
-    )
+    ),
+
 ]
