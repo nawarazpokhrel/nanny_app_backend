@@ -1,16 +1,11 @@
-from django.db import IntegrityError
+from django.contrib.auth import get_user_model
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from apps.skills.models import TimeSlot
 from apps.users import serializers, usecases
-
-from django.contrib.auth import get_user_model
-
-from apps.users.models import UserAvailability, UserProfile
 from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer
 
 User = get_user_model()
@@ -70,39 +65,10 @@ class CreateUserProfileView(generics.CreateAPIView):
             )
 
     def perform_create(self, serializer):
-        commitment_type = serializer.validated_data.pop('commitment_type')
-        skills = serializer.validated_data.pop('skills')
-        availabilities = serializer.validated_data.pop('availability')
-        try:
-
-            user_profile = UserProfile(**serializer.validated_data, user=self.get_object())
-
-            user_profile.save()
-        except IntegrityError:
-            raise ValidationError(
-                {
-                    'error': 'User already exist.'
-                }
-            )
-
-        user_profile.commitment_type.add(*commitment_type)
-        user_profile.skills.add(*skills)
-        user_profile.save()
-        for availability in availabilities:
-            day = availability.get('day')
-            time_slots = availability.get('timeslots')
-
-            # Create or Get the UserAvailability object for the given day
-            user_availability, created = UserAvailability.objects.get_or_create(
-                user_profile=user_profile,
-                day=day
-            )
-
-            for time_slot_data in time_slots:
-                time_slot_name = time_slot_data.get('name')
-                time_slot, created = TimeSlot.objects.get_or_create(name=time_slot_name)
-                user_availability.timeslots.add(time_slot)
-            user_availability.save()
+        return usecases.CreateUserProfileUseCase(
+            serializer=serializer,
+            user=self.get_object(),
+        ).execute()
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

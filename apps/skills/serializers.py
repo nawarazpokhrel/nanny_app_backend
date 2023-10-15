@@ -7,7 +7,7 @@ from apps.common import choices
 
 
 class ListAvailabilitySerializer(serializers.ModelSerializer):
-    name = ChoiceField(choices=choices.COMMIT_CHOICES, source='availability')
+    # name = ChoiceField(choices=choices.COMMIT_CHOICES, source='availability')
 
     class Meta:
         model = Availability
@@ -15,7 +15,7 @@ class ListAvailabilitySerializer(serializers.ModelSerializer):
 
 
 class ListSkillSerializer(serializers.ModelSerializer):
-    name = ChoiceField(choices=choices.SKILL_CHOICES,source='skills')
+    # name = ChoiceField(choices=choices.SKILL_CHOICES, source='skills')
 
     class Meta:
         model = Skills

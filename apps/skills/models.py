@@ -50,14 +50,16 @@ class Expectation(BaseModel):
     )
 
     def __str__(self):
-        return self.type
+        return self.get_type_display()
 
 
-class ChildCareNeed(models.Model):
+class ChildCareNeed(BaseModel):
     type = models.CharField(
         choices=ChildCareNeedChoices.choices,
         max_length=20
     )
 
     def __str__(self):
-        return self.type
+        return self.get_type_display()
+
+

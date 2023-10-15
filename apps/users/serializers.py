@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+from apps.booking.models import BookingDate
 from apps.common import choices
 from apps.common.choices import UserRole
 from apps.common.utils import ChoiceField
@@ -27,7 +28,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 
 class AuthUserDetailSerializer(serializers.ModelSerializer):
-    role = ChoiceField(choices=UserRole.choices)
+    # role = ChoiceField(choices=UserRole.choices)
 
     class Meta:
         model = User
@@ -38,7 +39,7 @@ class AuthUserDetailSerializer(serializers.ModelSerializer):
 
 
 class ListUserSerializer(serializers.ModelSerializer):
-    role = ChoiceField(choices=UserRole.choices)
+    # role = ChoiceField(choices=UserRole.choices)
 
     class Meta:
         model = User
@@ -46,7 +47,7 @@ class ListUserSerializer(serializers.ModelSerializer):
 
 
 class TimeSlotSerializer(serializers.ModelSerializer):
-    name = ChoiceField(choices=choices.TIME_CHOICES)
+    # name = ChoiceField(choices=choices.TIME_CHOICES)
 
     class Meta:
         model = TimeSlot
@@ -55,7 +56,6 @@ class TimeSlotSerializer(serializers.ModelSerializer):
 
 class UserAvailabilitySerializer(serializers.ModelSerializer):
     timeslots = TimeSlotSerializer(many=True)
-    day = ListDaysSerializer()
 
     class Meta:
         model = UserAvailability
@@ -98,6 +98,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
         return value
 
 
+#
 # {
 #     "commitment_type": [
 #         1,
@@ -212,3 +213,42 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         else:
             raise InvalidToken("User is not active.")
 
+
+class DateBookingSerializer(serializers.Serializer):
+    date = serializers.DateField()
+
+
+class BookingAvailabilitySerializer(serializers.ModelSerializer):
+    time_slots = TimeSlotSerializer(many=True)
+    day = DateBookingSerializer()
+
+    class Meta:
+        model = BookingDate
+        fields = ('day', 'time_slots')
+
+#
+# {
+#     "nanny": 1,
+#     "care_needs": [
+#         2
+#     ],
+#     "commitment": 1,
+#     "expectations": [
+#         3,
+#         4,
+#         5
+#     ],
+#     "additional_message": "ok",
+#     "availability": [
+#         {
+#             "day": {
+#                 "date": "2023-10-15"
+#             },
+#             "shift": [
+#                 {
+#                     "name": "MOR"
+#                 }
+#             ]
+#         }
+#     ]
+# }
