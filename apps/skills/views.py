@@ -2,14 +2,14 @@ from django.shortcuts import render
 
 from rest_framework.generics import ListAPIView
 from apps.skills.models import Availability, Skills, TimeSlot, Days
-from apps.skills.serializers import ListAvailiabilitySerializer,ListSkillSerializer, ListTimeSlotSerializer, ListDaysSerializer
+from apps.skills.serializers import ListAvailabilitySerializer,ListSkillSerializer, ListTimeSlotSerializer, ListDaysSerializer
 from rest_framework.exceptions import ValidationError
 
 # Create your views here.
 
 
 class ListAvailiabilityView(ListAPIView):
-    serializer_class = ListAvailiabilitySerializer
+    serializer_class = ListAvailabilitySerializer
 
     def get_queryset(self):
         return Availability.objects.all()

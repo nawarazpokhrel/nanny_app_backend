@@ -7,7 +7,7 @@ from apps.common import choices
 
 
 class Availability(BaseModel):
-    availability = models.CharField(max_length=50, choices=choices.COMMIT_CHOICES,unique=True)
+    availability = models.CharField(max_length=50, choices=choices.COMMIT_CHOICES, unique=True)
 
     def __str__(self):
         return self.get_availability_display()
@@ -21,7 +21,7 @@ class Skills(BaseModel):
 
 
 class TimeSlot(BaseModel):
-    name = models.CharField(max_length=50, choices=choices.TIME_CHOICES, unique=True)
+    name = models.CharField(max_length=50, choices=choices.TIME_CHOICES)
 
     def __str__(self):
         return self.get_name_display()

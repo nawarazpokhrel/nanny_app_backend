@@ -43,6 +43,7 @@ class UserProfile(BaseModel):
 
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
     date_of_birth = models.DateField(null=True, blank=True)
+    amount_per_hour = models.PositiveIntegerField(null=True)
     country = models.CharField(max_length=5, choices=COUNTRY_CHOICES, default='CA')
     address_line_1 = models.CharField(max_length=100, null=True, blank=True)
     postal_code = models.CharField(max_length=100, null=True, blank=True)

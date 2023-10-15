@@ -28,4 +28,16 @@ urlpatterns = [
 
     ),
 
+    path(
+        '<int:user_id>/personal-detail/list',
+        views.ListUserPersonalDetailView.as_view(),
+        name='user-personal-detail-list'
+
+    ),
+    path(
+        '<int:user_id>/personal-detail',
+        views.UserPersonalDetailView.as_view(),
+        name='user-personal-detail'
+
+    )
 ]
