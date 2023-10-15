@@ -1,4 +1,6 @@
 from django.db import models
+
+from apps.common.choices import ExpectationTypeChoices, ChildCareNeedChoices
 from apps.common.models import BaseModel
 from apps.common import choices
 
@@ -32,3 +34,30 @@ class Days(BaseModel):
 
     def __str__(self):
         return self.get_day_name_display()
+
+
+class Expectation(BaseModel):
+    TYPES = [
+        ('cooking', 'Cooking'),
+        ('dining', 'Dining'),
+        ('heavy_laundry', 'Heavy Laundry'),
+        ('cleaning', 'Cleaning Entire House'),
+        ('bathe_children', 'Bathe and Dress Children')
+    ]
+    type = models.CharField(
+        choices=ExpectationTypeChoices.choices,
+        max_length=50
+    )
+
+    def __str__(self):
+        return self.type
+
+
+class ChildCareNeed(models.Model):
+    type = models.CharField(
+        choices=ChildCareNeedChoices.choices,
+        max_length=20
+    )
+
+    def __str__(self):
+        return self.type

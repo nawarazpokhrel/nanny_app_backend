@@ -7,15 +7,13 @@ class UserRole(models.TextChoices):
 
 
 COUNTRY_CHOICES = (
-    ('CA','Canada'),
+    ('CA', 'Canada'),
 )
-
 
 COMMIT_CHOICES = (
     ('F', 'Full Time'),
     ('P', 'Part Time'),
 )
-
 
 SKILL_CHOICES = (
     ('C', 'Cooking'),
@@ -32,7 +30,6 @@ TIME_CHOICES = (
     ('NIG', 'Night'),
 )
 
-
 DAY_CHOICES = (
     ('SUN', 'Sunday'),
     ('MON', 'Monday'),
@@ -42,5 +39,27 @@ DAY_CHOICES = (
     ('FRI', 'Friday'),
     ('SAT', 'Saturday'),
 )
+
+
+class BookingStatusChoices(models.TextChoices):
+    PENDING = 'pending', 'Pending'
+    ACCEPTED = 'accepted', 'Accepted'
+    REJECTED = 'rejected', 'Rejected'
+    COMPLETED = 'completed', 'Completed'
+
+
+class ExpectationTypeChoices(models.TextChoices):
+    COOKING = 'cooking', 'Cooking'
+    DINING = 'dining', 'Dining'
+    HEAVY_LAUNDRY = 'heavy_laundry', 'Heavy Laundry'
+    CLEANING = 'cleaning', 'Cleaning Entire House'
+    BATHE_CHILDREN = 'bathe_children', 'Bathe and Dress Children'
+
+
+class ChildCareNeedChoices(models.TextChoices):
+    BABY_CARE = 'baby_care', 'Baby Care'
+    GRADE_SCHOOL = 'grade_school', 'Grade School'
+    TEENAGER = 'teenager', 'Teenager'
+    TODDLER = 'toddler', 'Toddler'
 
 

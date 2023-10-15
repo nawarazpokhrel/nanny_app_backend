@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from apps.common import choices
 from apps.common.choices import UserRole
@@ -21,7 +23,17 @@ class CreateUserSerializer(serializers.ModelSerializer):
             'fullname',
             'role',
             'password'
+        ]
 
+
+class AuthUserDetailSerializer(serializers.ModelSerializer):
+    role = ChoiceField(choices=UserRole.choices)
+
+    class Meta:
+        model = User
+        fields = [
+            'role',
+            'id'
         ]
 
 
@@ -179,3 +191,24 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
 
     def get_user_detail(self, obj):
         return ListUserSerializer(instance=obj).data
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        refresh = self.get_token(self.user)
+        data["refresh"] = str(refresh)
+        data["access"] = str(refresh.access_token)
+        user_ob = User.objects.get(phone_number=self.user.phone_number)
+        user_data = AuthUserDetailSerializer(user_ob).data
+        data["user"] = user_data
+        return data
+
+    @classmethod
+    def get_token(cls, user):
+        if user.is_active:
+            token = super().get_token(user)
+            return token
+        else:
+            raise InvalidToken("User is not active.")
+

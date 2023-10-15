@@ -1,7 +1,9 @@
 from django.db import IntegrityError
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.skills.models import TimeSlot
 from apps.users import serializers, usecases
@@ -9,7 +11,7 @@ from apps.users import serializers, usecases
 from django.contrib.auth import get_user_model
 
 from apps.users.models import UserAvailability, UserProfile
-from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer
+from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer
 
 User = get_user_model()
 
@@ -144,3 +146,6 @@ class UserPersonalDetailView(generics.RetrieveAPIView):
             )
 
 
+class CustomTokenObtainPairView(TokenObtainPairView):
+    permission_classes = (AllowAny,)
+    serializer_class = MyTokenObtainPairSerializer
