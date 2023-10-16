@@ -28,30 +28,26 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 
 class AuthUserDetailSerializer(serializers.ModelSerializer):
-    # role = ChoiceField(choices=UserRole.choices)
+    user_role = ChoiceField(choices=UserRole.choices,source='role')
 
     class Meta:
         model = User
         fields = [
-            'role',
+            'user_role',
             'id'
         ]
 
 
 class ListUserSerializer(serializers.ModelSerializer):
-    # role = ChoiceField(choices=UserRole.choices)
-
     class Meta:
         model = User
         exclude = ('password', 'groups', 'user_permissions')
 
 
 class TimeSlotSerializer(serializers.ModelSerializer):
-    # name = ChoiceField(choices=choices.TIME_CHOICES)
-
     class Meta:
         model = TimeSlot
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'timeslot_value')
 
 
 class UserAvailabilitySerializer(serializers.ModelSerializer):
@@ -220,11 +216,10 @@ class DateBookingSerializer(serializers.Serializer):
 
 class BookingAvailabilitySerializer(serializers.ModelSerializer):
     time_slots = TimeSlotSerializer(many=True)
-    day = DateBookingSerializer()
 
     class Meta:
         model = BookingDate
-        fields = ('day', 'time_slots')
+        fields = ('date', 'time_slots', 'booking')
 
 #
 # {
@@ -252,3 +247,19 @@ class BookingAvailabilitySerializer(serializers.ModelSerializer):
 #         }
 #     ]
 # }
+
+
+class AddToFavoritesSerializer(serializers.ModelSerializer):
+    id= serializers.IntegerField()
+    class Meta:
+        model = User
+        fields = ('id',)
+
+    def validate_id(self, value):
+        try:
+            user = User.objects.get(pk=value)
+            if user.role != 'N':
+                raise serializers.ValidationError("You can only add users with the Nanny role as favorites.")
+            return value
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User not found.")

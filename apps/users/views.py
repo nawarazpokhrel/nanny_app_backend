@@ -5,8 +5,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from apps.booking.permissions import IsParent
 from apps.users import serializers, usecases
-from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer
+from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer, \
+    AddToFavoritesSerializer, ListUserSerializer
 
 User = get_user_model()
 
@@ -84,18 +86,18 @@ class CreateUserProfileView(generics.CreateAPIView):
 class ListUserPersonalDetailView(generics.ListAPIView):
     serializer_class = UserPersonalDetailSerializer
 
-    def get_object(self):
-        user_id = self.kwargs.get('user_id')
-        try:
-            user = User.objects.get(pk=user_id)
-            return user
-        except User.DoesNotExist:
-            raise ValidationError(
-                {'error': 'user does not exist for following id.'}
-            )
+    # def get_object(self):
+    #     user_id = self.kwargs.get('user_id')
+    #     try:
+    #         user = User.objects.get(pk=user_id)
+    #         return user
+    #     except User.DoesNotExist:
+    #         raise ValidationError(
+    #             {'error': 'user does not exist for following id.'}
+    #         )
 
     def get_queryset(self):
-        return User.objects.filter(pk=self.get_object().id)
+        return User.objects.filter(role='N')
 
 
 class UserPersonalDetailView(generics.RetrieveAPIView):
@@ -104,7 +106,7 @@ class UserPersonalDetailView(generics.RetrieveAPIView):
     def get_object(self):
         user_id = self.kwargs.get('user_id')
         try:
-            user = User.objects.get(pk=user_id)
+            user = User.objects.get(pk=user_id, role='N')
             return user
         except User.DoesNotExist:
             raise ValidationError(
@@ -115,3 +117,39 @@ class UserPersonalDetailView(generics.RetrieveAPIView):
 class CustomTokenObtainPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)
     serializer_class = MyTokenObtainPairSerializer
+
+
+class AddToFavoritesView(generics.CreateAPIView):
+    serializer_class = AddToFavoritesSerializer
+
+    permission_classes = [IsParent]
+
+    def perform_create(self, serializer):
+        try:
+            user = User.objects.get(pk=serializer.validated_data.get('id'))
+        except User.DoesNotExist:
+            raise ValidationError(
+                {'error': 'user does not exist for following id.'}
+            )
+        if hasattr(self.request.user, 'userprofile'):
+            if user in self.request.user.userprofile.favorites.all():
+                raise ValidationError({'error': 'This user is already in your favorites.'})
+            self.request.user.userprofile.favorites.add(user)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        data = {
+            "message": "Favorite added successfully",
+            "status": status.HTTP_201_CREATED
+        }
+        return Response(data)
+
+
+class ListFavoritesView(generics.ListAPIView):
+    serializer_class = ListUserSerializer
+    permission_classes = [IsParent]
+
+    def get_queryset(self):
+        return self.request.user.userprofile.favorites.all()

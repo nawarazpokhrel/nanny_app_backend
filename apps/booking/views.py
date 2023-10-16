@@ -1,10 +1,14 @@
 from django.contrib.auth import get_user_model
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.booking import serializers
 from apps.booking.models import BookingDate, Booking
+from apps.booking.permissions import IsNanny
+from apps.booking.serializers import ListBookingSerializer, AcceptBookingSerializer
 from apps.skills.models import TimeSlot, Availability
 
 User = get_user_model()
@@ -95,28 +99,59 @@ class CreateBookingView(generics.CreateAPIView):
         return Response(data)
 
 
-{
-   "parent":2,
-   "care_needs":[
-      2
-   ],
-   "commitment":1,
-   "expectations":[
-      3,
-      4,
-      5
-   ],
-   "additional_message":"ok",
-   "availability":[
-      {
-         "day":{
-            "date":"2023-10-15"
-         },
-         "time_slots":[
-            {
-               "name":"MOR"
-            }
-         ]
-      }
-   ]
-}
+#
+# {
+#    "parent":2,
+#    "care_needs":[
+#       2
+#    ],
+#    "commitment":1,
+#    "expectations":[
+#       3,
+#       4,
+#       5
+#    ],
+#    "additional_message":"ok",
+#    "availability":[
+#       {
+#          "day":{
+#             "date":"2023-10-15"
+#          },
+#          "time_slots":[
+#             {
+#                "name":"MOR"
+#             }
+#          ]
+#       }
+#    ]
+# }
+#
+class ListBookingView(ListAPIView):
+    permission_classes = [IsNanny]
+    serializer_class = ListBookingSerializer
+
+    def get_queryset(self):
+        return Booking.objects.filter(nanny=self.request.user)
+
+
+class AcceptBookingView(generics.CreateAPIView):
+    permission_classes = [IsNanny]
+    serializer_class = AcceptBookingSerializer
+
+    def get_object(self):
+        booking_id = self.kwargs.get('booking_id')
+        try:
+            booking = Booking.objects.get(pk=booking_id)
+            return booking_id
+        except Booking.DoesNotExist:
+            raise ValidationError(
+                {'error': 'Booking does not exist for following id.'}
+            )
+
+    def perform_create(self, serializer):
+        booking = self.get_object()
+        booking.status = serializer.validated_data.get('status')
+        booking.save()
+
+        # send notification
+

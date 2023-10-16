@@ -14,11 +14,19 @@ class Availability(BaseModel):
     def __str__(self):
         return self.get_availability_display()
 
+    @property
+    def name(self):
+        return self.get_availability_display()
+
 
 class Skills(BaseModel):
     skills = models.CharField(max_length=100, choices=choices.SKILL_CHOICES, )
 
     def __str__(self):
+        return self.get_skills_display()
+
+    @property
+    def name(self):
         return self.get_skills_display()
 
 
@@ -28,12 +36,20 @@ class TimeSlot(BaseModel):
     def __str__(self):
         return self.get_name_display()
 
+    @property
+    def timeslot_value(self):
+        return self.get_name_display()
+
 
 class Days(BaseModel):
     day_name = models.CharField(max_length=20, choices=choices.DAY_CHOICES, unique=True)
 
     def __str__(self):
         return self.get_day_name_display()
+
+    @property
+    def day_value(self):
+        self.get_day_name_display()
 
 
 class Expectation(BaseModel):
@@ -62,4 +78,6 @@ class ChildCareNeed(BaseModel):
     def __str__(self):
         return self.get_type_display()
 
-
+    @property
+    def type_value(self):
+        return self.get_type_display()

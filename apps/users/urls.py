@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from apps.users import views
-from apps.users.views import CustomTokenObtainPairView
+from apps.users.views import CustomTokenObtainPairView, AddToFavoritesView
 
 urlpatterns = [
     path(
@@ -32,13 +32,13 @@ urlpatterns = [
     ),
 
     path(
-        '<int:user_id>/personal-detail/list',
+        'list/nannies',
         views.ListUserPersonalDetailView.as_view(),
         name='user-personal-detail-list'
 
     ),
     path(
-        '<int:user_id>/personal-detail',
+        '<int:user_id>/nannies-detail',
         views.UserPersonalDetailView.as_view(),
         name='user-personal-detail'
 
@@ -51,5 +51,13 @@ urlpatterns = [
     path('auth/token/refresh/',
          TokenRefreshView.as_view(),
          name='token_refresh'
+         ),
+    path('add-to-favourites',
+         AddToFavoritesView.as_view(),
+         name='add-to-favourites'
+         ),
+    path('list-favourites',
+         views.ListFavoritesView.as_view(),
+         name='list-favourites'
          ),
 ]

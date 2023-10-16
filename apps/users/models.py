@@ -66,7 +66,7 @@ class UserProfile(BaseModel):
     elderly_care_training_certificate = models.FileField(null=True, blank=True)
 
     bio = models.TextField(null=True, blank=True)
-
+    favorites = models.ManyToManyField(User, related_name='favorite_nannies', blank=True)
     def __str__(self):
         return self.user.fullname
 

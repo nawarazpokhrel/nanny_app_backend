@@ -35,3 +35,9 @@ class BookingDate(BaseModel):
     def __str__(self):
         time_slots = ", ".join([slot.name for slot in self.time_slots.all()])
         return f"Booking ID: {self.booking.id} | Date: {self.date} | Time slots: {time_slots}"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['booking', 'date'], name='unique_booking_date')
+        ]
+
