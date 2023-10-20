@@ -156,5 +156,9 @@ class AcceptBookingView(generics.CreateAPIView):
         # send notification
 
 
-class SearchUserProfile(ListAPIView):
-    pass
+class ListAcceptedBookingView(ListAPIView):
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = ListBookingSerializer
+
+    def get_queryset(self):
+        return Booking.objects.filter(status__in=['accepted', 'rejected'])

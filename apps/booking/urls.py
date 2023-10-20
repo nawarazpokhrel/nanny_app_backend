@@ -10,12 +10,16 @@ urlpatterns = [
          views.ListBookingView.as_view(),
          name='list-booking'
          ),
-    path('<int:booking_id>/accept',
+    # path('list/booking',
+    #      views.ListBookingView.as_view(),
+    #      name='list-booking'
+    #      ),
+    path('<int:booking_id>/accept-reject',
          views.AcceptBookingView.as_view(),
          name='accept-booking'
          ),
-    path('search',
-         views.SearchUserProfile.as_view(),
+    path('history',
+         views.ListAcceptedBookingView.as_view(),
          name='accept-booking'
          ),
 ]
