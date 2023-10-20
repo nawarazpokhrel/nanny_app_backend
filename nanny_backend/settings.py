@@ -50,7 +50,8 @@ LOCAL_APPS = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'drf_spectacular',
-    'drf_spectacular_sidecar'
+    'drf_spectacular_sidecar',
+    'corsheaders'
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -60,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -195,3 +197,23 @@ SIMPLE_JWT = {
     "JTI_CLAIM": "jti",
 
 }
+
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Specify the allowed headers and methods.
+CORS_ALLOW_HEADERS = [
+    'Accept',
+    'Accept-Language',
+    'Content-Language',
+    'Content-Type',
+    'Authorization',
+]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+]
