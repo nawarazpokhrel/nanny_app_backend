@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.booking.permissions import IsParent
-from apps.common.choices import UserRole
 from apps.users import serializers, usecases
 from apps.users.filters import filter_nannies
 from apps.users.models import UserProfile
