@@ -5,9 +5,9 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from apps.booking.models import BookingDate
 from apps.common import choices
-from apps.common.choices import UserRole
+from apps.common.choices import UserRole, CanadaCity
 from apps.common.utils import ChoiceField
-from apps.skills.models import TimeSlot
+from apps.skills.models import TimeSlot, Skills, Availability
 from apps.skills.serializers import ListSkillSerializer, ListAvailabilitySerializer, ListDaysSerializer
 from apps.users.models import UserProfile, UserAvailability
 
@@ -28,7 +28,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 
 class AuthUserDetailSerializer(serializers.ModelSerializer):
-    user_role = ChoiceField(choices=UserRole.choices,source='role')
+    user_role = ChoiceField(choices=UserRole.choices, source='role')
 
     class Meta:
         model = User
@@ -68,7 +68,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             'gender',
             'date_of_birth',
             'country',
-            'address_line_1',
+            'address',
             'amount_per_hour',
             'postal_code',
             'skills',
@@ -144,19 +144,21 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
     gender = ChoiceField(choices=GENDER_CHOICES)
     country = ChoiceField(choices=choices.COUNTRY_CHOICES)
     availability = UserAvailabilitySerializer(source='useravailability_set', many=True)
-    user_id = serializers.IntegerField(source='user.id')
+    role = serializers.CharField(source='user.role')
+    # user_id = serializers.IntegerField(source='user.id')
 
     class Meta:
         model = UserProfile
         fields = [
             'id',
-            'user_id',
+            'role',
+            # 'user_id',
             'commitment_type',
             'gender',
             'date_of_birth',
             'amount_per_hour',
             'country',
-            'address_line_1',
+            'address',
             'postal_code',
             'skills',
             'has_work_permit',
@@ -221,6 +223,7 @@ class BookingAvailabilitySerializer(serializers.ModelSerializer):
         model = BookingDate
         fields = ('date', 'time_slots', 'booking')
 
+
 #
 # {
 #     "nanny": 1,
@@ -250,7 +253,8 @@ class BookingAvailabilitySerializer(serializers.ModelSerializer):
 
 
 class AddToFavoritesSerializer(serializers.ModelSerializer):
-    id= serializers.IntegerField()
+    id = serializers.IntegerField()
+
     class Meta:
         model = User
         fields = ('id',)
@@ -263,3 +267,23 @@ class AddToFavoritesSerializer(serializers.ModelSerializer):
             return value
         except User.DoesNotExist:
             raise serializers.ValidationError("User not found.")
+
+
+class SearchCriteriaSerializer(serializers.Serializer):
+    commitment_type = serializers.MultipleChoiceField(choices=Availability.objects.all().values_list('availability', flat=True),
+                                                      required=False)
+    min_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
+    max_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
+    city = serializers.ChoiceField(choices=CanadaCity, required=False)
+    skills = serializers.MultipleChoiceField(choices=Skills.objects.all().values_list('skills', flat=True),
+                                             required=False)
+
+    def validate(self, data):
+        min_age = data.get('min_age')
+        max_age = data.get('max_age')
+
+        if min_age and max_age and min_age >= max_age:
+            raise serializers.ValidationError("Minimum age must be less than maximum age.")
+        return data
+
+

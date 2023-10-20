@@ -4,7 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from apps.common.choices import UserRole, COUNTRY_CHOICES
+from apps.common.choices import UserRole, COUNTRY_CHOICES, CanadaCity
 from apps.common.models import BaseModel
 from apps.common.utils import validate_file_size
 
@@ -45,7 +45,12 @@ class UserProfile(BaseModel):
     date_of_birth = models.DateField(null=True, blank=True)
     amount_per_hour = models.PositiveIntegerField(null=True)
     country = models.CharField(max_length=5, choices=COUNTRY_CHOICES, default='CA')
-    address_line_1 = models.CharField(max_length=100, null=True, blank=True)
+    address = models.CharField(
+        max_length=100,
+        choices=CanadaCity.choices,
+        null=True,
+        blank=True
+    )
     postal_code = models.CharField(max_length=100, null=True, blank=True)
 
     skills = models.ManyToManyField(Skills)

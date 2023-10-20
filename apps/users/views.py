@@ -6,9 +6,12 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.booking.permissions import IsParent
+from apps.common.choices import UserRole
 from apps.users import serializers, usecases
+from apps.users.filters import filter_nannies
+from apps.users.models import UserProfile
 from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer, \
-    AddToFavoritesSerializer, ListUserSerializer
+    AddToFavoritesSerializer, ListUserSerializer, SearchCriteriaSerializer
 
 User = get_user_model()
 
@@ -153,3 +156,21 @@ class ListFavoritesView(generics.ListAPIView):
 
     def get_queryset(self):
         return self.request.user.userprofile.favorites.all()
+
+
+class NannySearchView(generics.CreateAPIView):
+    serializer_class = serializers.SearchCriteriaSerializer
+    queryset = ''
+
+    # This serializer should represent the nanny data structure you want to return
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        filtered_nannies = filter_nannies(serializer.validated_data)
+
+        # Serialize the filtered nannies
+        nanny_serializer = serializers.UserPersonalProfileSerializer(filtered_nannies, many=True)
+
+        return Response(nanny_serializer.data, status=status.HTTP_200_OK)

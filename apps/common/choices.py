@@ -63,3 +63,14 @@ class ChildCareNeedChoices(models.TextChoices):
     TODDLER = 'toddler', 'Toddler'
 
 
+class CanadaCity(models.TextChoices):
+    TORONTO = 'TOR', 'Toronto'
+    VANCOUVER = 'VAN', 'Vancouver'
+    MONTREAL = 'MON', 'Montreal'
+    CALGARY = 'CAL', 'Calgary'
+    EDMONTON = 'EDM', 'Edmonton'
+    OTTAWA = 'OTT', 'Ottawa'
+    QUEBEC_CITY = 'QUE', 'Quebec City'
+    WINNIPEG = 'WIN', 'Winnipeg'
+    HALIFAX = 'HAL', 'Halifax'
+    VICTORIA = 'VIC', 'Victoria'

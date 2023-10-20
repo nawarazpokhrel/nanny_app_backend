@@ -155,3 +155,6 @@ class AcceptBookingView(generics.CreateAPIView):
 
         # send notification
 
+
+class SearchUserProfile(ListAPIView):
+    pass

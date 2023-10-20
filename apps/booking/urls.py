@@ -14,4 +14,8 @@ urlpatterns = [
          views.AcceptBookingView.as_view(),
          name='accept-booking'
          ),
+    path('search',
+         views.SearchUserProfile.as_view(),
+         name='accept-booking'
+         ),
 ]
