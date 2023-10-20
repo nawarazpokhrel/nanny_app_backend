@@ -60,8 +60,8 @@ urlpatterns = [
          views.ListFavoritesView.as_view(),
          name='list-favourites'
          ),
-    path('nanny-search',
-         views.NannySearchView.as_view(),
-         name='search-nanny'
-         ),
+    # path('nanny-search',
+    #      views.NannySearchView.as_view(),
+    #      name='search-nanny'
+    #      ),
 ]
