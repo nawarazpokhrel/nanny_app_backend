@@ -22,4 +22,8 @@ urlpatterns = [
          views.ListAcceptedBookingView.as_view(),
          name='accept-booking'
          ),
+    path('<int:booking_id>/review-add',
+         views.AddReviewView.as_view(),
+         name='add-review'
+         ),
 ]

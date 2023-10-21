@@ -51,7 +51,8 @@ THIRD_PARTY_APPS = [
     'rest_framework',
     'drf_spectacular',
     'drf_spectacular_sidecar',
-    'corsheaders'
+    'corsheaders',
+    'django_filters'
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -155,7 +156,11 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny'
-    ]
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser']
 }
 
 SPECTACULAR_SETTINGS = {
@@ -197,7 +202,6 @@ SIMPLE_JWT = {
     "JTI_CLAIM": "jti",
 
 }
-
 
 CORS_ALLOW_ALL_ORIGINS = True
 

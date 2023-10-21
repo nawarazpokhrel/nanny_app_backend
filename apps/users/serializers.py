@@ -93,7 +93,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Duplicate days are not allowed in availability.")
         return value
 
-
+#
 #
 # {
 #     "commitment_type": [
@@ -223,7 +223,7 @@ class BookingAvailabilitySerializer(serializers.ModelSerializer):
         model = BookingDate
         fields = ('date', 'time_slots', 'booking')
 
-
+#
 #
 # {
 #     "nanny": 1,

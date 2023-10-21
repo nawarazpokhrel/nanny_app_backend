@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.booking.models import Booking, BookingDate
+from apps.booking.models import Booking, BookingDate, Review
 from apps.common.utils import ChoiceField
 from apps.skills.serializers import ChildCareNeedSerializer, ListSkillSerializer, ListAvailabilitySerializer
 from apps.users.serializers import BookingAvailabilitySerializer, ListUserSerializer, TimeSlotSerializer
@@ -65,3 +65,9 @@ class AcceptBookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = ('status',)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ['rating', 'message']
+        model = Review

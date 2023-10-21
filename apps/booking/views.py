@@ -4,10 +4,13 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from django.db import IntegrityError
 
 from apps.booking import serializers
-from apps.booking.models import BookingDate, Booking
-from apps.booking.permissions import IsNanny
+from apps.booking.filters import BookingFilter
+from apps.booking.models import BookingDate, Booking, Review
+from apps.booking.permissions import IsNanny, IsParent
 from apps.booking.serializers import ListBookingSerializer, AcceptBookingSerializer
 from apps.skills.models import TimeSlot, Availability
 
@@ -142,7 +145,7 @@ class AcceptBookingView(generics.CreateAPIView):
         booking_id = self.kwargs.get('booking_id')
         try:
             booking = Booking.objects.get(pk=booking_id)
-            return booking_id
+            return booking
         except Booking.DoesNotExist:
             raise ValidationError(
                 {'error': 'Booking does not exist for following id.'}
@@ -159,6 +162,47 @@ class AcceptBookingView(generics.CreateAPIView):
 class ListAcceptedBookingView(ListAPIView):
     permission_classes = [IsAuthenticated, ]
     serializer_class = ListBookingSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = BookingFilter
 
     def get_queryset(self):
-        return Booking.objects.filter(status__in=['accepted', 'rejected'])
+        if self.request.user.role == 'P':
+            return Booking.objects.filter(status__in=['accepted', 'rejected'], parent=self.request.user,
+                                          parent__role='P')
+        else:
+            return Booking.objects.filter(status__in=['accepted', 'rejected'], nanny=self.request.user,
+                                          parent__role='N')
+
+
+class AddReviewView(generics.CreateAPIView):
+    permission_classes = [IsParent]
+    serializer_class = serializers.ReviewSerializer
+
+    def get_object(self):
+        booking_id = self.kwargs.get('booking_id')
+        try:
+            booking = Booking.objects.get(pk=booking_id)
+            return booking
+        except Booking.DoesNotExist:
+            raise ValidationError(
+                {'error': 'Booking does not exist for following id.'}
+            )
+
+    def perform_create(self, serializer):
+        booking = self.get_object()
+        print(booking.id)
+
+        if Booking.objects.filter(pk=booking.id, status='accepted').exists():
+            data = serializer.validated_data
+
+            try:
+                review = Review(user=self.request.user, booking=booking, **data)
+                review.save()
+            except IntegrityError:
+                raise ValidationError({
+                    'error': "review for this booking already exist"
+                })
+        else:
+            raise ValidationError({
+                'error': "No booking available for   review "
+            })
