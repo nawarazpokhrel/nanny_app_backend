@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from apps.common.choices import BookingStatusChoices
+from apps.common.choices import BookingStatusChoices, RatingChoices
 from apps.common.models import BaseModel
+from django.core.exceptions import ValidationError
 from apps.skills.models import ChildCareNeed, Availability, Expectation, TimeSlot, Skills
 
 User = get_user_model()
@@ -41,3 +42,20 @@ class BookingDate(BaseModel):
             models.UniqueConstraint(fields=['booking', 'date'], name='unique_booking_date')
         ]
 
+
+class Review(BaseModel):
+    booking = models.OneToOneField(Booking, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.CharField(max_length=5, choices=RatingChoices.choices)
+    message = models.CharField(max_length=200, blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.user.fullname} ->{self.rating}'
+
+    def clean(self):
+        if self.user.role != 'P':
+            raise ValidationError(
+                {
+                    'user': "User need to be Parent to review"
+                }
+            )

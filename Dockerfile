@@ -1,29 +1,22 @@
-FROM python:3.9-alpine3.13
+FROM --platform=$BUILDPLATFORM python:3.13-alpine AS builder
+EXPOSE 8002
+WORKDIR /app
+COPY requirements.txt /app
+RUN pip3 install -r requirements.txt --no-cache-dir
+COPY . /app
+ENTRYPOINT ["python3"]
+CMD ["manage.py", "runserver", "0.0.0.0:8000"]
 
-LABEL maintainer="navarajpokharel@outlook.com"
+FROM builder as dev-envs
+RUN <<EOF
+apk update
+apk add git
+EOF
 
-ENV DockerHOME=/home/app/webapp \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
-
-# Install psycopg2 dependencies
-RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
-
-# Create directory for the app user
-RUN mkdir -p $DockerHOME \
-    && addgroup -S app && adduser -S app -G app \
-    && chown app:app $DockerHOME
-
-# Switch to the app user
-USER app
-
-WORKDIR $DockerHOME
-
-# Upgrade pip and install python dependencies
-COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
-
-# Copy the rest of the application code
-COPY . $DockerHOME
-
-ENTRYPOINT [ "/bin/bash", "docker-entrypoint.sh" ]
+RUN <<EOF
+addgroup -S docker
+adduser -S --shell /bin/bash --ingroup docker vscode
+EOF
+# install Docker tools (cli, buildx, compose)
+COPY --from=gloursdocker/docker / /
+CMD ["manage.py", "runserver", "0.0.0.0:8000"]
