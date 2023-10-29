@@ -29,7 +29,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     def __str__(self):
-        return str(self.fullname)
+        print(self.review_set.all())
+        return f'{str(self.fullname)}-> {self.role}'
+
 
 
 class UserProfile(BaseModel):
@@ -73,7 +75,7 @@ class UserProfile(BaseModel):
     bio = models.TextField(null=True, blank=True)
     favorites = models.ManyToManyField(User, related_name='favorite_nannies', blank=True)
     def __str__(self):
-        return self.user.fullname
+        return f'{self.user.fullname}->role {self.user.role}'
 
 
 class UserAvailability(BaseModel):
@@ -87,3 +89,34 @@ class UserAvailability(BaseModel):
     def __str__(self):
         time_slots = ", ".join([slot.name for slot in self.timeslots.all()])
         return f"{self.user_profile.user.fullname} -> {self.day.day_name} -> {time_slots}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

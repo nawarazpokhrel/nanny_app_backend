@@ -1,11 +1,12 @@
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from apps.booking.models import BookingDate
+from apps.booking.models import BookingDate, Review
 from apps.common import choices
-from apps.common.choices import UserRole, CanadaCity
+from apps.common.choices import UserRole, CanadaCity, RatingChoices
 from apps.common.utils import ChoiceField
 from apps.skills.models import TimeSlot, Skills, Availability
 from apps.skills.serializers import ListSkillSerializer, ListAvailabilitySerializer, ListDaysSerializer
@@ -39,9 +40,18 @@ class AuthUserDetailSerializer(serializers.ModelSerializer):
 
 
 class ListUserSerializer(serializers.ModelSerializer):
+    avatar = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         exclude = ('password', 'groups', 'user_permissions')
+
+    def get_avatar(self, obj):
+        request = self.context.get('parser_context').get('request')
+        if request and obj.avatar:
+            # Construct the full image URL based on the request
+            return request.build_absolute_uri(obj.avatar.url)
+        return None
 
 
 class TimeSlotSerializer(serializers.ModelSerializer):
@@ -56,6 +66,30 @@ class UserAvailabilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAvailability
         fields = ('day', 'timeslots')
+
+
+class IndividualRatingDetailSerializer(serializers.Serializer):
+    rating = serializers.ChoiceField(choices=RatingChoices.choices)
+    count = serializers.IntegerField()
+
+
+class ListReviewSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Review
+        fields = [
+            'id',
+            'booking',
+            'user',
+            'rating',
+            'message',
+            'created_at',
+            'updated_at'
+        ]
+
+    def get_user(self, obj):
+        return ListUserSerializer(instance=obj.user, context=self.context.__dict__).data
 
 
 class CreateProfileSerializer(serializers.ModelSerializer):
@@ -92,6 +126,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
         if len(days) != len(set(days)):
             raise serializers.ValidationError("Duplicate days are not allowed in availability.")
         return value
+
 
 #
 #
@@ -133,6 +168,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
 #   ]
 # }
 
+
 class UserPersonalProfileSerializer(serializers.ModelSerializer):
     commitment_type = ListAvailabilitySerializer(many=True)
     skills = ListSkillSerializer(many=True)
@@ -145,6 +181,7 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
     country = ChoiceField(choices=choices.COUNTRY_CHOICES)
     availability = UserAvailabilitySerializer(source='useravailability_set', many=True)
     role = serializers.CharField(source='user.role')
+
     # user_id = serializers.IntegerField(source='user.id')
 
     class Meta:
@@ -178,18 +215,39 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
 
 class UserPersonalDetailSerializer(serializers.ModelSerializer):
     user_detail = serializers.SerializerMethodField()
+    review_stats = serializers.SerializerMethodField()
 
     personal_detail = UserPersonalProfileSerializer(source='userprofile')
+
+    review = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = [
             'user_detail',
-            'personal_detail'
+            'personal_detail',
+            'review',
+            'review_stats'
         ]
 
     def get_user_detail(self, obj):
-        return ListUserSerializer(instance=obj).data
+        return ListUserSerializer(instance=obj, context=self.context.get('request').__dict__).data
+
+    def get_review(self, obj):
+        reviews = self.context.get('reviews', [])
+        return ListReviewSerializer(reviews, many=True, context=self.context.get('request')).data
+
+    def get_review_stats(self, obj):
+        reviews = self.context.get('reviews', [])
+        total_reviews = len(reviews)
+
+        # Calculate individual ratings
+        individual_ratings = []
+        for rating in RatingChoices.choices:
+            count = reviews.filter(rating=rating[0]).count()
+            individual_ratings.append({"rating": rating[0], "count": count})
+
+        return {"total_reviews": total_reviews, "individual_review": individual_ratings}
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -222,6 +280,7 @@ class BookingAvailabilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = BookingDate
         fields = ('date', 'time_slots', 'booking')
+
 
 #
 #

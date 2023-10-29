@@ -1,10 +1,13 @@
 from django.contrib.auth.base_user import BaseUserManager
-from django.utils.translation import  gettext_lazy as _
+from django.utils.translation import gettext_lazy as _
+
+
 class CustomUserManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
     for authentication instead of usernames.
     """
+
     def create_user(self, phone_number, password, **extra_fields):
         """
         Create and save a User with the given email and password.
@@ -29,3 +32,6 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(_('Superuser must have is_superuser=True.'))
         return self.create_user(phone_number, password, **extra_fields)
+
+    def nanny_reviews(self):
+        return self.filter(role='N').review_set.all()

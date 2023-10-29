@@ -27,6 +27,20 @@ class Booking(BaseModel):
     def __str__(self):
         return f"Booking #{self.id} - {self.parent.fullname} to {self.nanny.fullname}"
 
+    def clean(self):
+        if self.parent.role == 'N':
+            raise ValidationError(
+                {
+                    'parent': "Parent  cannot  to be Nanny"
+                }
+            )
+        if self.nanny.role == 'P':
+            raise ValidationError(
+                {
+                    'nanny': "Nanny   cannot  to be parent"
+                }
+            )
+
 
 class BookingDate(BaseModel):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='dates')

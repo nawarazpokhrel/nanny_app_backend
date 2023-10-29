@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from apps.booking.models import Review
 from apps.booking.permissions import IsParent
 from apps.users import serializers, usecases
 from apps.users.filters import filter_nannies
@@ -112,8 +113,17 @@ class UserPersonalDetailView(generics.RetrieveAPIView):
             return user
         except User.DoesNotExist:
             raise ValidationError(
-                {'error': 'user does not exist for following id.'}
+                {'error': 'Nanny user does not exist for following id.'}
             )
+
+    def get_serializer_context(self):
+        user = self.get_object()
+        reviews = Review.objects.filter(booking__nanny=user)
+        context = super().get_serializer_context()
+        context['request'] = self.request
+
+        context['reviews'] = reviews
+        return context
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):

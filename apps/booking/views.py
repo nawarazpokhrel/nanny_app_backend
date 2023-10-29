@@ -190,7 +190,6 @@ class AddReviewView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         booking = self.get_object()
-        print(booking.id)
 
         if Booking.objects.filter(pk=booking.id, status='accepted').exists():
             data = serializer.validated_data
