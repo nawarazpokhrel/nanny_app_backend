@@ -13,19 +13,35 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import environ
+import os
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+
+# Set the project base directory
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Take environment variables from .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+
 from django.conf import settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-e835y85ibd)leq7ejsj6=^4^-a!c(pxydw!!b7^1ony-!t$%84'
+DEBUG = env('DEBUG')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Raises Django's ImproperlyConfigured
+# exception if SECRET_KEY not in os.environ
+SECRET_KEY = env('SECRET_KEY')
+
 
 ALLOWED_HOSTS = ['*']
 
@@ -101,11 +117,22 @@ WSGI_APPLICATION = 'nanny_backend.wsgi.application'
 #         'PORT': '5432',
 #     }
 # }
+#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DB_NAME'),  # Your database name
+        'USER': env('DB_USER'),  # Your database username
+        'PASSWORD': env('DB_USER'),  # Replace with your actual database password
+        'HOST':  env('DB_HOST'),
+        'PORT': '5432',
     }
 }
 
