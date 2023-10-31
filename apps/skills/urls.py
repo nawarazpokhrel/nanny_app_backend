@@ -1,5 +1,5 @@
 from django.urls import path
-from apps.skills.views import ListAvailiabilityView, ListSkillView, LisTimeSlotView, ListDaysView
+from apps.skills.views import ListAvailiabilityView, ListSkillView, LisTimeSlotView, ListDaysView, ListExpectationView
 
 urlpatterns = [
     path('availiability',
@@ -19,6 +19,11 @@ urlpatterns = [
     path(
         'days',
         ListDaysView.as_view(),
+        name='days'
+    ),
+    path(
+        'expectation',
+        ListExpectationView.as_view(),
         name='days'
     ),
 ]

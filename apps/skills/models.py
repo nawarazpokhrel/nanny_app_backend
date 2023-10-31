@@ -68,6 +68,10 @@ class Expectation(BaseModel):
     def __str__(self):
         return self.get_type_display()
 
+    @property
+    def type_value(self):
+        return self.get_type_display()
+
 
 class ChildCareNeed(BaseModel):
     type = models.CharField(
