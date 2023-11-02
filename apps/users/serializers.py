@@ -47,11 +47,15 @@ class ListUserSerializer(serializers.ModelSerializer):
         exclude = ('password', 'groups', 'user_permissions')
 
     def get_avatar(self, obj):
-        request = self.context.get('parser_context').get('request')
+        if self.context.get('class') == 'USER':
+            context = self.context.get('request').__dict__
+            request = context.get('parser_context').get('request')
+        else:
+            request = self.context.get('parser_context').get('request')
         if request and obj.avatar:
-            # Construct the full image URL based on the request
             return request.build_absolute_uri(obj.avatar.url)
-        return None
+        else:
+            return None
 
 
 class TimeSlotSerializer(serializers.ModelSerializer):

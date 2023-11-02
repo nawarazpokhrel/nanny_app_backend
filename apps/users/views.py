@@ -41,6 +41,12 @@ class ListUserView(generics.ListAPIView):
     def get_queryset(self):
         return User.objects.all()
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        context['class'] = 'USER'
+        return context
+
 
 class UserDetailView(generics.RetrieveAPIView):
     serializer_class = serializers.ListUserSerializer
