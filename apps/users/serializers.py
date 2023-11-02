@@ -256,9 +256,10 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
 
         # Calculate individual ratings
         individual_ratings = []
-        for rating in RatingChoices.choices:
-            count = reviews.filter(rating=rating[0]).count()
-            individual_ratings.append({"rating": rating[0], "count": count})
+        if reviews:
+            for rating in RatingChoices.choices:
+                count = reviews.filter(rating=rating[0]).count()
+                individual_ratings.append({"rating": rating[0], "count": count})
 
         return {"total_reviews": total_reviews, "individual_review": individual_ratings}
 
