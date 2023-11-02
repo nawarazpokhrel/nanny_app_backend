@@ -21,6 +21,7 @@ User = get_user_model()
 
 class CreateBookingView(generics.CreateAPIView):
     serializer_class = serializers.CreateBookingSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         user_id = self.kwargs.get('user_id')
@@ -39,7 +40,7 @@ class CreateBookingView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         commitment_type = serializer.validated_data.pop('commitment')
-        parent = serializer.validated_data.pop('parent')
+        parent = self.request.user
 
         if parent.role != 'P':
             raise ValidationError(
@@ -77,8 +78,8 @@ class CreateBookingView(generics.CreateAPIView):
         booking.care_needs.add(*care_needs)
         booking.save()
         for availability in availabilities:
-            days = availability.get('day')
-            extracted_date = days['date']
+            # days = availability.get('day')
+            extracted_date = availability.get('date')
             time_slots = availability.get('time_slots')
             booking_date, created = BookingDate.objects.get_or_create(
                 booking=booking,
@@ -96,7 +97,7 @@ class CreateBookingView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         data = {
-            "message": "Booking profile created successfully",
+            "message": "Booking request created successfully",
             "status": status.HTTP_201_CREATED
         }
         return Response(data)

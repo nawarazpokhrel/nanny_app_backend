@@ -9,7 +9,8 @@ from apps.common import choices
 from apps.common.choices import UserRole, CanadaCity, RatingChoices
 from apps.common.utils import ChoiceField
 from apps.skills.models import TimeSlot, Skills, Availability
-from apps.skills.serializers import ListSkillSerializer, ListAvailabilitySerializer, ListDaysSerializer
+from apps.skills.serializers import ListSkillSerializer, ListAvailabilitySerializer, ListDaysSerializer, \
+    ListExpectationSerializer
 from apps.users.models import UserProfile, UserAvailability
 
 User = get_user_model()
@@ -30,12 +31,17 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 class AuthUserDetailSerializer(serializers.ModelSerializer):
     user_role = ChoiceField(choices=UserRole.choices, source='role')
+    has_user_profile = serializers.BooleanField()
 
     class Meta:
         model = User
         fields = [
+            'id',
+            'phone_number',
             'user_role',
-            'id'
+            'fullname',
+            'has_user_profile',
+
         ]
 
 
@@ -107,6 +113,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             'date_of_birth',
             'country',
             'address',
+            'expectation',
             'amount_per_hour',
             'postal_code',
             'skills',
@@ -131,7 +138,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Duplicate days are not allowed in availability.")
         return value
 
-
+#
 #
 #
 # {
@@ -175,6 +182,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
 
 class UserPersonalProfileSerializer(serializers.ModelSerializer):
     commitment_type = ListAvailabilitySerializer(many=True)
+    expectation = ListExpectationSerializer(many=True)
     skills = ListSkillSerializer(many=True)
     GENDER_CHOICES = (
         ('M', 'Male'),
@@ -195,6 +203,7 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
             'role',
             # 'user_id',
             'commitment_type',
+            'expectation',
             'gender',
             'date_of_birth',
             'amount_per_hour',
@@ -283,10 +292,10 @@ class BookingAvailabilitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BookingDate
-        fields = ('date', 'time_slots', 'booking')
+        fields = ('date', 'time_slots')
 
 
-#
+
 #
 # {
 #     "nanny": 1,
@@ -301,17 +310,16 @@ class BookingAvailabilitySerializer(serializers.ModelSerializer):
 #     ],
 #     "additional_message": "ok",
 #     "availability": [
+#     {
+#       "date": "2023-11-02",
+#       "time_slots": [
 #         {
-#             "day": {
-#                 "date": "2023-10-15"
-#             },
-#             "shift": [
-#                 {
-#                     "name": "MOR"
-#                 }
-#             ]
+#           "name": "MOR"
 #         }
-#     ]
+#       ],
+#       "booking": 0
+#     }
+#   ]
 # }
 
 
@@ -331,22 +339,22 @@ class AddToFavoritesSerializer(serializers.ModelSerializer):
         except User.DoesNotExist:
             raise serializers.ValidationError("User not found.")
 
-#
-# class SearchCriteriaSerializer(serializers.Serializer):
-#     commitment_type = serializers.MultipleChoiceField(choices=Availability.objects.all().values_list('availability', flat=True),
-#                                                       required=False)
-#     min_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
-#     max_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
-#     city = serializers.ChoiceField(choices=CanadaCity, required=False)
-#     skills = serializers.MultipleChoiceField(choices=Skills.objects.all().values_list('skills', flat=True),
-#                                              required=False)
-#
-#     def validate(self, data):
-#         min_age = data.get('min_age')
-#         max_age = data.get('max_age')
-#
-#         if min_age and max_age and min_age >= max_age:
-#             raise serializers.ValidationError("Minimum age must be less than maximum age.")
-#         return data
-#
+
+class SearchCriteriaSerializer(serializers.Serializer):
+    commitment_type = serializers.MultipleChoiceField(choices=Availability.objects.all().values_list('availability', flat=True),
+                                                      required=False)
+    min_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
+    max_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
+    city = serializers.ChoiceField(choices=CanadaCity, required=False)
+    skills = serializers.MultipleChoiceField(choices=Skills.objects.all().values_list('skills', flat=True),
+                                             required=False)
+
+    def validate(self, data):
+        min_age = data.get('min_age')
+        max_age = data.get('max_age')
+
+        if min_age and max_age and min_age >= max_age:
+            raise serializers.ValidationError("Minimum age must be less than maximum age.")
+        return data
+
 #

@@ -49,7 +49,7 @@ class Days(BaseModel):
 
     @property
     def day_value(self):
-        self.get_day_name_display()
+        return self.get_day_name_display()
 
 
 class Expectation(BaseModel):

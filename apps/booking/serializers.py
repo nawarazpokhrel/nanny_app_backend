@@ -1,8 +1,6 @@
 from rest_framework import serializers
 
 from apps.booking.models import Booking, BookingDate, Review
-from apps.common.choices import RatingChoices
-from apps.common.utils import ChoiceField
 from apps.skills.serializers import ChildCareNeedSerializer, ListSkillSerializer, ListAvailabilitySerializer
 from apps.users.serializers import BookingAvailabilitySerializer, ListUserSerializer, TimeSlotSerializer
 
@@ -13,7 +11,6 @@ class CreateBookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = [
-            'parent',
             'care_needs',
             'commitment',
             'expectations',

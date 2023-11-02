@@ -29,6 +29,7 @@ class ListTimeSlotSerializer(serializers.ModelSerializer):
 
 
 class ListDaysSerializer(serializers.ModelSerializer):
+    day_value = serializers.CharField()
     # name = ChoiceField(choices=choices.DAY_CHOICES,source='day_name')
 
     class Meta:
@@ -53,3 +54,8 @@ class ListExpectationSerializer(serializers.ModelSerializer):
             'type',
             'type_value'
         ]
+
+
+class CitySerializer(serializers.Serializer):
+    city = serializers.CharField()
+    short_name = serializers.CharField()

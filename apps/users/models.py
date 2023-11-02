@@ -8,7 +8,7 @@ from apps.common.choices import UserRole, COUNTRY_CHOICES, CanadaCity
 from apps.common.models import BaseModel
 from apps.common.utils import validate_file_size
 
-from apps.skills.models import Availability, Skills, Days, TimeSlot
+from apps.skills.models import Availability, Skills, Days, TimeSlot, Expectation
 from apps.users.managers import CustomUserManager
 
 
@@ -29,8 +29,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     def __str__(self):
-        print(self.review_set.all())
         return f'{str(self.fullname)}-> {self.role}'
+
+    @property
+    def has_user_profile(self):
+        if hasattr(self, 'userprofile'):
+            return True
+        else:
+            return False
 
 
 
@@ -53,6 +59,7 @@ class UserProfile(BaseModel):
         null=True,
         blank=True
     )
+    expectation = models.ManyToManyField(Expectation)
     postal_code = models.CharField(max_length=100, null=True, blank=True)
 
     skills = models.ManyToManyField(Skills)
