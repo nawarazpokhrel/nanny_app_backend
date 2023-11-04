@@ -30,7 +30,7 @@ class CreateUserProfileUseCase(BaseUseCase):
         commitment_type = self._data.pop('commitment_type')
         skills = self._data.pop('skills')
         availabilities = self._data.pop('availability')
-        expectation = self._data.pop('expectation')
+        experience = self._data.pop('experience')
         try:
 
             user_profile = UserProfile(**self._data, user=self._user)
@@ -45,7 +45,7 @@ class CreateUserProfileUseCase(BaseUseCase):
 
         user_profile.commitment_type.add(*commitment_type)
         user_profile.skills.add(*skills)
-        user_profile.expectation.add(*expectation)
+        user_profile.experience.add(*experience)
         user_profile.save()
         for availability in availabilities:
             date = availability.get('day')
@@ -56,8 +56,8 @@ class CreateUserProfileUseCase(BaseUseCase):
             )
 
             for time_slot_data in time_slots:
-                time_slot_name = time_slot_data.get('name')
-                time_slot, created = TimeSlot.objects.get_or_create(name=time_slot_name)
+                time_slot_name = time_slot_data.get('slug')
+                time_slot, created = TimeSlot.objects.get_or_create(slug=time_slot_name)
                 user_availability.timeslots.add(time_slot)
             user_availability.save()
 

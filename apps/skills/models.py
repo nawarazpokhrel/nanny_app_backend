@@ -3,6 +3,7 @@ from django.db import models
 from apps.common.choices import ExpectationTypeChoices, ChildCareNeedChoices
 from apps.common.models import BaseModel
 from apps.common import choices
+from django.utils.text import slugify
 
 
 # Create your models here.
@@ -32,6 +33,7 @@ class Skills(BaseModel):
 
 class TimeSlot(BaseModel):
     name = models.CharField(max_length=50, choices=choices.TIME_CHOICES)
+    slug = models.SlugField(unique=True, blank=True,null=True,editable=False)  # Add a SlugField
 
     def __str__(self):
         return self.get_name_display()
@@ -39,6 +41,11 @@ class TimeSlot(BaseModel):
     @property
     def timeslot_value(self):
         return self.get_name_display()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.get_name_display())
+        super(TimeSlot, self).save(*args, **kwargs)
 
 
 class Days(BaseModel):

@@ -67,7 +67,7 @@ class ListUserSerializer(serializers.ModelSerializer):
 class TimeSlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = TimeSlot
-        fields = ('id', 'name', 'timeslot_value')
+        fields = ('id', 'name', 'timeslot_value', 'slug')
 
 
 class UserAvailabilitySerializer(serializers.ModelSerializer):
@@ -113,7 +113,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             'date_of_birth',
             'country',
             'address',
-            'expectation',
+            'experience',
             'amount_per_hour',
             'postal_code',
             'skills',
@@ -195,7 +195,6 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
     availability = UserAvailabilitySerializer(source='useravailability_set', many=True)
     role = serializers.CharField(source='user.role')
     rating = serializers.FloatField(source='user.average_rating')
-    has_been_favourite = serializers.SerializerMethodField()
     user_detail = serializers.SerializerMethodField()
 
     class Meta:
@@ -226,28 +225,10 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
             'availability',
             'user_detail',
             'rating',
-            'has_been_favourite'
-
         ]
 
     def get_user_detail(self, obj):
         return ListUserSerializer(instance=obj.user, context=self.context.__dict__).data
-
-    def get_has_been_favourite(self, obj):
-        # user = self.context.__dict__.get('_user')
-        # favorited_users = User.objects.filter(favorites=user)
-        # # print(favorited_users.filter(favorites__id=user.id).values('favorites__fullname'))
-        #
-        # if favorited_users.filter(favorites__id=user.id).exists():
-        #     return True
-        # return False
-        # user = self.context.__dict__.get('_user')  # Make sure '_user' is set in the context
-        #
-        # if user is not None:
-        #     if User.objects.filter(favorites=user, id=obj.id).exists():
-        #         return True
-
-        return False
 
 
 class UserPersonalDetailSerializer(serializers.ModelSerializer):

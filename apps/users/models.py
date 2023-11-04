@@ -74,6 +74,7 @@ class UserProfile(BaseModel):
         ('F', 'Female'),
         ('O', 'Other'),
     )
+    experience_years = models.PositiveIntegerField(null=True)
 
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
     date_of_birth = models.DateField(null=True, blank=True)
@@ -85,7 +86,7 @@ class UserProfile(BaseModel):
         null=True,
         blank=True
     )
-    expectation = models.ManyToManyField(Expectation)
+    experience = models.ManyToManyField(Expectation)
     postal_code = models.CharField(max_length=100, null=True, blank=True)
 
     skills = models.ManyToManyField(Skills)
