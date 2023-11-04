@@ -1,6 +1,6 @@
 from django.urls import path
-from apps.skills.views import ListAvailiabilityView, ListSkillView, LisTimeSlotView, ListDaysView, ListExperienceView, \
-    CityListView
+from apps.skills.views import ListAvailiabilityView, ListSkillView, LisTimeSlotView, ListDaysView, ListExpectationView, \
+    CityListView, ListExperienceView
 
 urlpatterns = [
     path('availiability',
@@ -23,9 +23,14 @@ urlpatterns = [
         name='days'
     ),
     path(
+        'expectation-list',
+        ListExpectationView.as_view(),
+        name='days'
+    ),
+    path(
         'experience-list',
         ListExperienceView.as_view(),
-        name='days'
+        name='experience'
     ),
     path('cities/list', CityListView.as_view(), name='city-list'),
 

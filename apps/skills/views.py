@@ -1,9 +1,9 @@
 from django.shortcuts import render
 
 from rest_framework.generics import ListAPIView
-from apps.skills.models import Availability, Skills, TimeSlot, Days, Expectation
+from apps.skills.models import Availability, Skills, TimeSlot, Days, Expectation, Experience
 from apps.skills.serializers import ListAvailabilitySerializer, ListSkillSerializer, ListTimeSlotSerializer, \
-    ListDaysSerializer, ListExpectationSerializer, CitySerializer
+    ListDaysSerializer, ListExpectationSerializer, CitySerializer, ChildCareNeedSerializer
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import  APIView
 from rest_framework.response import  Response
@@ -39,11 +39,18 @@ class ListDaysView(ListAPIView):
         return Days.objects.all()
 
 
-class ListExperienceView(ListAPIView):
+class ListExpectationView(ListAPIView):
     serializer_class = ListExpectationSerializer
 
     def get_queryset(self):
         return Expectation.objects.all()
+
+
+class ListExperienceView(ListAPIView):
+    serializer_class = ChildCareNeedSerializer
+
+    def get_queryset(self):
+        return Experience.objects.all()
 
 
 class CityListView(APIView):
