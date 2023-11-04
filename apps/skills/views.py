@@ -39,7 +39,7 @@ class ListDaysView(ListAPIView):
         return Days.objects.all()
 
 
-class ListExpectationView(ListAPIView):
+class ListExperienceView(ListAPIView):
     serializer_class = ListExpectationSerializer
 
     def get_queryset(self):
