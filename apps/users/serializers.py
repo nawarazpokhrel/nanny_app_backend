@@ -10,7 +10,7 @@ from apps.common.choices import UserRole, CanadaCity, RatingChoices
 from apps.common.utils import ChoiceField
 from apps.skills.models import TimeSlot, Skills, Availability
 from apps.skills.serializers import ListSkillSerializer, ListAvailabilitySerializer, ListDaysSerializer, \
-    ListExpectationSerializer
+    ListExpectationSerializer, ChildCareNeedSerializer
 from apps.users.models import UserProfile, UserAvailability
 
 User = get_user_model()
@@ -113,6 +113,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             'date_of_birth',
             'country',
             'address',
+            'experience_years',
             'experience',
             'amount_per_hour',
             'postal_code',
@@ -183,7 +184,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
 
 class UserPersonalProfileSerializer(serializers.ModelSerializer):
     commitment_type = ListAvailabilitySerializer(many=True)
-    expectation = ListExpectationSerializer(many=True)
+    experience = ChildCareNeedSerializer(many=True)
     skills = ListSkillSerializer(many=True)
     GENDER_CHOICES = (
         ('M', 'Male'),
@@ -203,7 +204,7 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
             'id',
             'role',
             'commitment_type',
-            'expectation',
+            'experience',
             'gender',
             'date_of_birth',
             'amount_per_hour',
