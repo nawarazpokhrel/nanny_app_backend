@@ -80,7 +80,7 @@ class Expectation(BaseModel):
         return self.get_type_display()
 
 
-class ChildCareNeed(BaseModel):
+class Experience(BaseModel):
     type = models.CharField(
         choices=ChildCareNeedChoices.choices,
         max_length=20

@@ -9,7 +9,7 @@ from apps.common.choices import UserRole, COUNTRY_CHOICES, CanadaCity, RatingCho
 from apps.common.models import BaseModel
 from apps.common.utils import validate_file_size
 
-from apps.skills.models import Availability, Skills, Days, TimeSlot, Expectation
+from apps.skills.models import Availability, Skills, Days, TimeSlot, Expectation, Experience
 from apps.users.managers import CustomUserManager
 
 
@@ -86,7 +86,7 @@ class UserProfile(BaseModel):
         null=True,
         blank=True
     )
-    experience = models.ManyToManyField(Expectation)
+    experience = models.ManyToManyField(Experience)
     postal_code = models.CharField(max_length=100, null=True, blank=True)
 
     skills = models.ManyToManyField(Skills)

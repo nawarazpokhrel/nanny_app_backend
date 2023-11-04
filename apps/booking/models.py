@@ -4,7 +4,7 @@ from django.db import models
 
 from apps.common.choices import RatingChoices
 from apps.common.models import BaseModel
-from apps.skills.models import ChildCareNeed, Availability, Expectation, TimeSlot, Skills
+from apps.skills.models import Experience, Availability, Expectation, TimeSlot, Skills
 
 User = get_user_model()
 
@@ -12,7 +12,7 @@ User = get_user_model()
 class Booking(BaseModel):
     parent = models.ForeignKey(User, on_delete=models.CASCADE, related_name='parent_bookings')
     nanny = models.ForeignKey(User, on_delete=models.CASCADE, related_name='nanny_bookings')
-    care_needs = models.ManyToManyField(ChildCareNeed)
+    care_needs = models.ManyToManyField(Experience)
     commitment = models.ForeignKey(Availability, on_delete=models.CASCADE, null=True)
     expectations = models.ManyToManyField(Skills)
     additional_message = models.TextField(blank=True, null=True)

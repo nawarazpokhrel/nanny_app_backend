@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.common.utils import ChoiceField
-from apps.skills.models import Availability, Skills, TimeSlot, Days, ChildCareNeed, Expectation
+from apps.skills.models import Availability, Skills, TimeSlot, Days, Expectation, Experience
 
 from apps.common import choices
 
@@ -42,7 +42,7 @@ class ChildCareNeedSerializer(serializers.ModelSerializer):
     # name = ChoiceField(choices=choices.DAY_CHOICES,source='day_name')
 
     class Meta:
-        model = ChildCareNeed
+        model = Experience
         fields = ('type', 'id', 'type_value')
 
 
