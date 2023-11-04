@@ -25,11 +25,12 @@ class ListSkillSerializer(serializers.ModelSerializer):
 class ListTimeSlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = TimeSlot
-        fields = ('name', 'timeslot_value', 'id')
+        fields = ('name', 'timeslot_value', 'id', 'slug')
 
 
 class ListDaysSerializer(serializers.ModelSerializer):
     day_value = serializers.CharField()
+
     # name = ChoiceField(choices=choices.DAY_CHOICES,source='day_name')
 
     class Meta:
