@@ -344,19 +344,11 @@ class AddToFavoritesSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id',)
 
-    def validate_id(self, value):
-        try:
-            user = User.objects.get(pk=value)
-            if user.role != 'N':
-                raise serializers.ValidationError("You can only add users with the Nanny role as favorites.")
-            return value
-        except User.DoesNotExist:
-            raise serializers.ValidationError("User not found.")
-
 
 class SearchCriteriaSerializer(serializers.Serializer):
-    commitment_type = serializers.MultipleChoiceField(choices=Availability.objects.all().values_list('availability', flat=True),
-                                                      required=False)
+    commitment_type = serializers.MultipleChoiceField(
+        choices=Availability.objects.all().values_list('availability', flat=True),
+        required=False)
     min_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
     max_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
     city = serializers.ChoiceField(choices=CanadaCity, required=False)

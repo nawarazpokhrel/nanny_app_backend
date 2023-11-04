@@ -139,16 +139,25 @@ class AddToFavoritesView(generics.CreateAPIView):
     permission_classes = [IsParent]
 
     def perform_create(self, serializer):
+        if self.request.user == serializer.validated_data.get('id'):
+            raise ValidationError(
+                {'error': 'You cannot add favorites yourself!'}
+            )
+
         try:
             user = User.objects.get(pk=serializer.validated_data.get('id'))
         except User.DoesNotExist:
             raise ValidationError(
                 {'error': 'user does not exist for following id.'}
             )
-        if hasattr(self.request.user, 'userprofile'):
-            if user in self.request.user.userprofile.favorites.all():
-                raise ValidationError({'error': 'This user is already in your favorites.'})
-            self.request.user.userprofile.favorites.add(user)
+        if user.role == 'P':
+            raise ValidationError(
+                {'error': 'You can only add users with the Nanny role as favorites.'}
+            )
+
+        if user in self.request.user.favorites.all():
+            raise ValidationError({'error': 'This user is already in your favorites.'})
+        self.request.user.favorites.add(user)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -166,7 +175,13 @@ class ListFavoritesView(generics.ListAPIView):
     permission_classes = [IsParent]
 
     def get_queryset(self):
-        return self.request.user.userprofile.favorites.all()
+        return self.request.user.favorites.all()
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        context['class'] = 'USER'
+        return context
 
 
 class NannySearchView(generics.CreateAPIView):
@@ -182,7 +197,7 @@ class NannySearchView(generics.CreateAPIView):
         filtered_nannies = filter_nannies(serializer.validated_data)
 
         # Serialize the filtered nannies
-        nanny_serializer = serializers.UserPersonalProfileSerializer(filtered_nannies, many=True,context=self.request)
+        nanny_serializer = serializers.UserPersonalProfileSerializer(filtered_nannies, many=True, context=self.request)
 
         return Response(nanny_serializer.data, status=status.HTTP_200_OK)
 
@@ -190,3 +205,40 @@ class NannySearchView(generics.CreateAPIView):
     #     context = super().get_serializer_context()
     #     context['request'] = self.request
     #     return context
+
+
+class RemoveFavoritesView(generics.CreateAPIView):
+    serializer_class = AddToFavoritesSerializer
+
+    permission_classes = [IsParent]
+
+    def perform_create(self, serializer):
+        if self.request.user.id == serializer.validated_data.get('id'):
+            raise ValidationError(
+                {'error': 'You cannot add or remove favorites by yourself!'}
+            )
+
+        try:
+            user = User.objects.get(pk=serializer.validated_data.get('id'))
+        except User.DoesNotExist:
+            raise ValidationError(
+                {'error': 'user does not exist for following id.'}
+            )
+        if user.role == 'P':
+            raise ValidationError(
+                {'error': 'You can only remove users with the Nanny role as favorites.'}
+            )
+
+        if user not in self.request.user.favorites.all():
+            raise ValidationError({'error': 'This user is already unfavoured.'})
+        self.request.user.favorites.remove(user)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        data = {
+            "message": "Favorite removed successfully",
+            "status": status.HTTP_201_CREATED
+        }
+        return Response(data)

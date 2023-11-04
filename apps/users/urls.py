@@ -56,6 +56,11 @@ urlpatterns = [
          AddToFavoritesView.as_view(),
          name='add-to-favourites'
          ),
+    path('remove-from-favourites',
+         views.RemoveFavoritesView.as_view(),
+         name='remove-from-favorites'
+         ),
+
     path('list-favourites',
          views.ListFavoritesView.as_view(),
          name='list-favourites'

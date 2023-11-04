@@ -29,6 +29,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
+    favorites = models.ManyToManyField('self', blank=True)
+
+
     def __str__(self):
         return f'{str(self.fullname)}-> {self.role}'
 
@@ -65,8 +68,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             return average
         else:
             return None
-
-
 
 
 class UserProfile(BaseModel):
@@ -109,7 +110,7 @@ class UserProfile(BaseModel):
     elderly_care_training_certificate = models.FileField(null=True, blank=True)
 
     bio = models.TextField(null=True, blank=True)
-    favorites = models.ManyToManyField(User, related_name='favorite_nannies', blank=True)
+
     def __str__(self):
         return f'{self.user.fullname}->role {self.user.role}'
 
@@ -125,34 +126,3 @@ class UserAvailability(BaseModel):
     def __str__(self):
         time_slots = ", ".join([slot.name for slot in self.timeslots.all()])
         return f"{self.user_profile.user.fullname} -> {self.day.day_name} -> {time_slots}"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
