@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 
-from apps.common.choices import BookingStatusChoices, RatingChoices
+from apps.common.choices import RatingChoices
 from apps.common.models import BaseModel
-from django.core.exceptions import ValidationError
 from apps.skills.models import ChildCareNeed, Availability, Expectation, TimeSlot, Skills
 
 User = get_user_model()

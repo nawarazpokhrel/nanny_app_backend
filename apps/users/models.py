@@ -1,10 +1,11 @@
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+from django.db.models import Avg
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from apps.common.choices import UserRole, COUNTRY_CHOICES, CanadaCity
+from apps.common.choices import UserRole, COUNTRY_CHOICES, CanadaCity, RatingChoices
 from apps.common.models import BaseModel
 from apps.common.utils import validate_file_size
 
@@ -37,6 +38,34 @@ class User(AbstractBaseUser, PermissionsMixin):
             return True
         else:
             return False
+
+    # @property
+    # def review_rating(self):
+    #     self.nanny_bookings_set.filter()
+    @property
+    def average_rating(self):
+        from apps.booking.models import Review
+
+        if self.role == 'N':
+            # Calculate the average rating for the user's reviews
+            rating_mapping = {
+                RatingChoices.ONE: 1,
+                RatingChoices.TWO: 2,
+                RatingChoices.THREE: 3,
+                RatingChoices.FOUR: 4,
+                RatingChoices.FIVE: 5,
+            }
+
+            # Calculate the average rating for the user's reviews
+            reviews = Review.objects.filter(booking__nanny=self)
+
+            # Calculate the average using the mapped values
+            total = sum(rating_mapping[review.rating] for review in reviews)
+            average = total / len(reviews) if len(reviews) > 0 else 0
+            return average
+        else:
+            return None
+
 
 
 

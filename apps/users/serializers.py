@@ -138,6 +138,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Duplicate days are not allowed in availability.")
         return value
 
+
 #
 #
 #
@@ -193,6 +194,8 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
     country = ChoiceField(choices=choices.COUNTRY_CHOICES)
     availability = UserAvailabilitySerializer(source='useravailability_set', many=True)
     role = serializers.CharField(source='user.role')
+    rating = serializers.FloatField(source='user.average_rating')
+    user_detail = serializers.SerializerMethodField()
 
     # user_id = serializers.IntegerField(source='user.id')
 
@@ -201,7 +204,6 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'role',
-            # 'user_id',
             'commitment_type',
             'expectation',
             'gender',
@@ -222,8 +224,14 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
             'has_elderly_care_training',
             'elderly_care_training_certificate',
             'bio',
-            'availability'
+            'availability',
+            'user_detail',
+            'rating',
+
         ]
+
+    def get_user_detail(self, obj):
+        return ListUserSerializer(instance=obj.user, context=self.context.__dict__).data
 
 
 class UserPersonalDetailSerializer(serializers.ModelSerializer):
@@ -265,8 +273,14 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    role = serializers.ChoiceField(choices=UserRole.choices)
+
     def validate(self, attrs):
         data = super().validate(attrs)
+        role = attrs.get('role')
+        if not role:
+            raise serializers.ValidationError("User role  is required.")
+
         refresh = self.get_token(self.user)
         data["refresh"] = str(refresh)
         data["access"] = str(refresh.access_token)
@@ -294,7 +308,6 @@ class BookingAvailabilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = BookingDate
         fields = ('date', 'time_slots')
-
 
 
 #
@@ -347,6 +360,7 @@ class SearchCriteriaSerializer(serializers.Serializer):
     min_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
     max_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
     city = serializers.ChoiceField(choices=CanadaCity, required=False)
+
     skills = serializers.MultipleChoiceField(choices=Skills.objects.all().values_list('skills', flat=True),
                                              required=False)
 

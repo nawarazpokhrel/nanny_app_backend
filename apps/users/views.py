@@ -101,16 +101,6 @@ class CreateUserProfileView(generics.CreateAPIView):
 class ListUserPersonalDetailView(generics.ListAPIView):
     serializer_class = UserPersonalDetailSerializer
 
-    # def get_object(self):
-    #     user_id = self.kwargs.get('user_id')
-    #     try:
-    #         user = User.objects.get(pk=user_id)
-    #         return user
-    #     except User.DoesNotExist:
-    #         raise ValidationError(
-    #             {'error': 'user does not exist for following id.'}
-    #         )
-
     def get_queryset(self):
         return User.objects.filter(role='N')
 
@@ -192,6 +182,11 @@ class NannySearchView(generics.CreateAPIView):
         filtered_nannies = filter_nannies(serializer.validated_data)
 
         # Serialize the filtered nannies
-        nanny_serializer = serializers.UserPersonalProfileSerializer(filtered_nannies, many=True)
+        nanny_serializer = serializers.UserPersonalProfileSerializer(filtered_nannies, many=True,context=self.request)
 
         return Response(nanny_serializer.data, status=status.HTTP_200_OK)
+
+    # def get_serializer_context(self):
+    #     context = super().get_serializer_context()
+    #     context['request'] = self.request
+    #     return context
