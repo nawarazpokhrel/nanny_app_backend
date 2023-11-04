@@ -229,7 +229,7 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
         ]
 
     def get_user_detail(self, obj):
-        return ListUserSerializer(instance=obj.user, context=self.context.__dict__).data
+        return ListUserSerializer(instance=obj.user, context=self.context.get('request').__dict__).data
 
 
 class UserPersonalDetailSerializer(serializers.ModelSerializer):
