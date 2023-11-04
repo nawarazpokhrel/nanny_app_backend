@@ -31,7 +31,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     favorites = models.ManyToManyField('self', blank=True)
 
-
     def __str__(self):
         return f'{str(self.fullname)}-> {self.role}'
 
@@ -42,9 +41,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         else:
             return False
 
-    # @property
-    # def review_rating(self):
-    #     self.nanny_bookings_set.filter()
     @property
     def average_rating(self):
         from apps.booking.models import Review

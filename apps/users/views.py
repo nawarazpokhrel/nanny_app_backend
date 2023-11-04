@@ -187,6 +187,7 @@ class ListFavoritesView(generics.ListAPIView):
 class NannySearchView(generics.CreateAPIView):
     serializer_class = serializers.SearchCriteriaSerializer
     queryset = ''
+    permission_classes = [IsParent]
 
     # This serializer should represent the nanny data structure you want to return
 
@@ -197,14 +198,13 @@ class NannySearchView(generics.CreateAPIView):
         filtered_nannies = filter_nannies(serializer.validated_data)
 
         # Serialize the filtered nannies
-        nanny_serializer = serializers.UserPersonalProfileSerializer(filtered_nannies, many=True, context=self.request)
-
-        return Response(nanny_serializer.data, status=status.HTTP_200_OK)
-
-    # def get_serializer_context(self):
-    #     context = super().get_serializer_context()
-    #     context['request'] = self.request
-    #     return context
+        nanny_data = []
+        for nanny in filtered_nannies:
+            nanny_info = serializers.UserPersonalProfileSerializer(nanny, context=self.request).data
+            if User.objects.get(pk=nanny_info.get('user_detail').get('id')) in self.request.user.favorites.all():
+                nanny_info['has_been_favorite'] = True
+            nanny_data.append(nanny_info)
+        return Response(nanny_data, status=status.HTTP_200_OK)
 
 
 class RemoveFavoritesView(generics.CreateAPIView):

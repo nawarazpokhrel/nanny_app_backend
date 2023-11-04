@@ -195,9 +195,8 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
     availability = UserAvailabilitySerializer(source='useravailability_set', many=True)
     role = serializers.CharField(source='user.role')
     rating = serializers.FloatField(source='user.average_rating')
+    has_been_favourite = serializers.SerializerMethodField()
     user_detail = serializers.SerializerMethodField()
-
-    # user_id = serializers.IntegerField(source='user.id')
 
     class Meta:
         model = UserProfile
@@ -227,11 +226,28 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
             'availability',
             'user_detail',
             'rating',
+            'has_been_favourite'
 
         ]
 
     def get_user_detail(self, obj):
         return ListUserSerializer(instance=obj.user, context=self.context.__dict__).data
+
+    def get_has_been_favourite(self, obj):
+        # user = self.context.__dict__.get('_user')
+        # favorited_users = User.objects.filter(favorites=user)
+        # # print(favorited_users.filter(favorites__id=user.id).values('favorites__fullname'))
+        #
+        # if favorited_users.filter(favorites__id=user.id).exists():
+        #     return True
+        # return False
+        # user = self.context.__dict__.get('_user')  # Make sure '_user' is set in the context
+        #
+        # if user is not None:
+        #     if User.objects.filter(favorites=user, id=obj.id).exists():
+        #         return True
+
+        return False
 
 
 class UserPersonalDetailSerializer(serializers.ModelSerializer):
@@ -363,5 +379,3 @@ class SearchCriteriaSerializer(serializers.Serializer):
         if min_age and max_age and min_age >= max_age:
             raise serializers.ValidationError("Minimum age must be less than maximum age.")
         return data
-
-#
