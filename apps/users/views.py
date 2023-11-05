@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.booking.models import Review
-from apps.booking.permissions import IsParent
+from apps.booking.permissions import IsParent, IsNanny
 from apps.users import serializers, usecases
 from apps.users.filters import filter_nannies
 from apps.users.models import UserProfile
@@ -70,21 +70,12 @@ class UserDetailView(generics.RetrieveAPIView):
 
 class CreateUserProfileView(generics.CreateAPIView):
     serializer_class = CreateProfileSerializer
-
-    def get_object(self):
-        user_id = self.kwargs.get('user_id')
-        try:
-            user = User.objects.get(pk=user_id)
-            return user
-        except User.DoesNotExist:
-            raise ValidationError(
-                {'error': 'user does not exist for following id.'}
-            )
+    permission_classes = [IsNanny, ]
 
     def perform_create(self, serializer):
         return usecases.CreateUserProfileUseCase(
             serializer=serializer,
-            user=self.get_object(),
+            user=self.request.user,
         ).execute()
 
     def create(self, request, *args, **kwargs):

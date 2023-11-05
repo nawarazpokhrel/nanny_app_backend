@@ -65,6 +65,8 @@ class ListUserSerializer(serializers.ModelSerializer):
 
 
 class TimeSlotSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=False)
+    slug = serializers.CharField(allow_null=False)
     class Meta:
         model = TimeSlot
         fields = ('id', 'name', 'timeslot_value', 'slug')
@@ -283,6 +285,10 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data["refresh"] = str(refresh)
         data["access"] = str(refresh.access_token)
         user_ob = User.objects.get(phone_number=self.user.phone_number)
+        if user_ob.role != role:
+            raise serializers.ValidationError({
+                'error':'Role does not match.'
+            })
         user_data = AuthUserDetailSerializer(user_ob).data
         data["user"] = user_data
         return data

@@ -56,16 +56,16 @@ class ListExperienceView(ListAPIView):
 class CityListView(APIView):
     def get(self, request):
         cities = [
-            {"city": "Toronto", "short_name": "Tor"},
-            {"city": "Vancouver", "short_name": "Van"},
-            {"city": "Montreal", "short_name": "Mon"},
-            {"city": "Calgary", "short_name": "Cal"},
-            {"city": "Edmonton", "short_name": "Edm"},
-            {"city": "Ottawa", "short_name": "Ott"},
-            {"city": "Quebec City", "short_name": "Que"},
-            {"city": "Winnipeg", "short_name": "Win"},
-            {"city": "Halifax", "short_name": "Hal"},
-            {"city": "Victoria", "short_name": "Vic"},
+            {"city": "Toronto", "short_name": "TOR"},
+            {"city": "Vancouver", "short_name": "VAN"},
+            {"city": "Montreal", "short_name": "MON"},
+            {"city": "Calgary", "short_name": "CAL"},
+            {"city": "Edmonton", "short_name": "EDM"},
+            {"city": "Ottawa", "short_name": "OTT"},
+            {"city": "Quebec City", "short_name": "QUE"},
+            {"city": "Winnipeg", "short_name": "WIN"},
+            {"city": "Halifax", "short_name": "HAL"},
+            {"city": "Victoria", "short_name": "VIC"},
         ]
 
         serializer = CitySerializer(cities, many=True)
