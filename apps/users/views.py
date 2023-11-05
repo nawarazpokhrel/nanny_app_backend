@@ -4,7 +4,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
-
+from rest_framework import parsers
 from apps.booking.models import Review
 from apps.booking.permissions import IsParent, IsNanny
 from apps.users import serializers, usecases
@@ -71,6 +71,7 @@ class UserDetailView(generics.RetrieveAPIView):
 class CreateUserProfileView(generics.CreateAPIView):
     serializer_class = CreateProfileSerializer
     permission_classes = [IsNanny, ]
+    parser_classes = [parsers.MultiPartParser]
 
     def perform_create(self, serializer):
         return usecases.CreateUserProfileUseCase(

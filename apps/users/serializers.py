@@ -106,6 +106,8 @@ class ListReviewSerializer(serializers.ModelSerializer):
 
 class CreateProfileSerializer(serializers.ModelSerializer):
     availability = UserAvailabilitySerializer(many=True)
+    work_permit_pr = serializers.FileField()
+    first_aid_training_certificate = serializers.FileField(allow_null=True,required=False)
 
     class Meta:
         model = UserProfile
