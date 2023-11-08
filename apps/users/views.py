@@ -192,7 +192,11 @@ class NannySearchView(generics.CreateAPIView):
         # Serialize the filtered nannies
         nanny_data = []
         for nanny in filtered_nannies:
-            nanny_info = serializers.UserPersonalProfileSerializer(nanny, context=self.request).data
+            nanny_info = serializers.UserPersonalProfileSerializer(nanny, context=
+            {'request': self.request,
+             'class': "Search"
+             }
+                                                                   ).data
             if User.objects.get(pk=nanny_info.get('user_detail').get('id')) in self.request.user.favorites.all():
                 nanny_info['has_been_favorite'] = True
             nanny_data.append(nanny_info)

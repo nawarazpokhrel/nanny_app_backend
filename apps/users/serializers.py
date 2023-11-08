@@ -233,6 +233,7 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
         ]
 
     def get_user_detail(self, obj):
+        # print(self.context)
         return ListUserSerializer(instance=obj.user, context=self.context.get('request').__dict__).data
 
 
@@ -352,15 +353,15 @@ class AddToFavoritesSerializer(serializers.ModelSerializer):
 
 
 class SearchCriteriaSerializer(serializers.Serializer):
-    commitment_type = serializers.MultipleChoiceField(
-        choices=Availability.objects.all().values_list('availability', flat=True),
-        required=False)
+    # commitment_type = serializers.MultipleChoiceField(
+    #     choices=Availability.objects.all().values_list('availability', flat=True),
+    #     required=False)
     min_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
     max_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
     city = serializers.ChoiceField(choices=CanadaCity, required=False)
 
-    skills = serializers.MultipleChoiceField(choices=Skills.objects.all().values_list('skills', flat=True),
-                                             required=False)
+    # skills = serializers.MultipleChoiceField(choices=Skills.objects.all().values_list('skills', flat=True),
+    #                                          required=False)
 
     def validate(self, data):
         min_age = data.get('min_age')
