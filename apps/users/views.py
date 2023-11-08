@@ -199,6 +199,9 @@ class NannySearchView(generics.CreateAPIView):
                                                                    ).data
             if User.objects.get(pk=nanny_info.get('user_detail').get('id')) in self.request.user.favorites.all():
                 nanny_info['has_been_favorite'] = True
+            else:
+                nanny_info['has_been_favorite'] = False
+
             nanny_data.append(nanny_info)
         return Response(nanny_data, status=status.HTTP_200_OK)
 
