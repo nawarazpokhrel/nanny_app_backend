@@ -209,6 +209,7 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
             'role',
             'commitment_type',
             'experience',
+            'experience_years',
             'gender',
             'date_of_birth',
             'amount_per_hour',
