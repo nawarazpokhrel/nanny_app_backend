@@ -71,7 +71,7 @@ class UserDetailView(generics.RetrieveAPIView):
 class CreateUserProfileView(generics.CreateAPIView):
     serializer_class = CreateProfileSerializer
     permission_classes = [IsNanny, ]
-    parser_classes = [parsers.MultiPartParser]
+    parser_classes = [parsers.MultiPartParser,parsers.FormParser]
 
     def perform_create(self, serializer):
         return usecases.CreateUserProfileUseCase(
