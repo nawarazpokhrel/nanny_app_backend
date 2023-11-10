@@ -5,7 +5,7 @@ from django.db.models import Avg
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from apps.common.choices import UserRole, COUNTRY_CHOICES, CanadaCity, RatingChoices
+from apps.common.choices import UserRole, COUNTRY_CHOICES, CanadaCity, RatingChoices, Language
 from apps.common.models import BaseModel
 from apps.common.utils import validate_file_size
 
@@ -80,12 +80,18 @@ class UserProfile(BaseModel):
     date_of_birth = models.DateField(null=True, blank=True)
     amount_per_hour = models.PositiveIntegerField(null=True)
     country = models.CharField(max_length=5, choices=COUNTRY_CHOICES, default='CA')
-    address = models.CharField(
+    city = models.CharField(
         max_length=100,
         choices=CanadaCity.choices,
         null=True,
         blank=True
     )
+    language = models.CharField(
+        max_length=10,
+        choices=Language.choices,
+        null=True,
+    )
+    address = models.CharField(null=True,blank=True)
     experience = models.ManyToManyField(Experience)
     postal_code = models.CharField(max_length=100, null=True, blank=True)
 

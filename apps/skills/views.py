@@ -1,9 +1,11 @@
 from django.shortcuts import render
 
 from rest_framework.generics import ListAPIView
+
+from apps.common.choices import Language
 from apps.skills.models import Availability, Skills, TimeSlot, Days, Expectation, Experience
 from apps.skills.serializers import ListAvailabilitySerializer, ListSkillSerializer, ListTimeSlotSerializer, \
-    ListDaysSerializer, ListExpectationSerializer, CitySerializer, ChildCareNeedSerializer
+    ListDaysSerializer, ListExpectationSerializer, CitySerializer, ChildCareNeedSerializer,LanguageSerializer
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import  APIView
 from rest_framework.response import  Response
@@ -69,4 +71,16 @@ class CityListView(APIView):
         ]
 
         serializer = CitySerializer(cities, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class LanguageListView(APIView):
+    def get(self, request, *args, **kwargs):
+        # Retrieve all choices from the Language model
+        choices = Language.choices
+
+        # Serialize the choices using a serializer
+        serializer = LanguageSerializer(choices, many=True)
+
+        # Return the serialized data
         return Response(serializer.data, status=status.HTTP_200_OK)

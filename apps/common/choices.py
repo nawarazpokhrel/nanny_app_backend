@@ -82,3 +82,11 @@ class RatingChoices(models.TextChoices):
     THREE = '3', '3'
     FOUR = '4', '4'
     FIVE = '5', '5'
+
+
+class Language(models.TextChoices):
+    ENGLISH = 'en', 'English'
+    SPANISH = 'es', 'Spanish'
+    FRENCH = 'fr', 'French'
+    GERMAN = 'de', 'German'
+    CHINESE = 'zh', 'Chinese'

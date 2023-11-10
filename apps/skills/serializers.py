@@ -60,3 +60,8 @@ class ListExpectationSerializer(serializers.ModelSerializer):
 class CitySerializer(serializers.Serializer):
     city = serializers.CharField()
     short_name = serializers.CharField()
+
+
+class LanguageSerializer(serializers.Serializer):
+    code = serializers.CharField(source='0')
+    name = serializers.CharField(source='1')
