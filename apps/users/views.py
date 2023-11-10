@@ -71,7 +71,7 @@ class UserDetailView(generics.RetrieveAPIView):
 class CreateUserProfileView(generics.CreateAPIView):
     serializer_class = CreateProfileSerializer
     permission_classes = [IsNanny, ]
-    parser_classes = [parsers.MultiPartParser,parsers.FormParser]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
 
     def perform_create(self, serializer):
         return usecases.CreateUserProfileUseCase(
@@ -174,6 +174,15 @@ class ListFavoritesView(generics.ListAPIView):
         context['request'] = self.request
         context['class'] = 'USER'
         return context
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serialized_data = self.get_serializer(queryset, many=True).data
+        for item in serialized_data:
+            user_id = item.get('id')
+            item['has_been_favorite'] = User.objects.get(pk=user_id) in self.request.user.favorites.all()
+
+        return Response(serialized_data, status=status.HTTP_200_OK)
 
 
 class NannySearchView(generics.CreateAPIView):
