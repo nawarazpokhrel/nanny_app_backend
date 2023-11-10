@@ -105,7 +105,7 @@ class ListReviewSerializer(serializers.ModelSerializer):
 
 
 class CreateProfileSerializer(serializers.ModelSerializer):
-    availability = UserAvailabilitySerializer(many=True)
+    # availability = UserAvailabilitySerializer(many=True,required=False,allow_null=True)
     work_permit_pr = serializers.FileField()
     first_aid_training_certificate = serializers.FileField(allow_null=True,required=False)
 
@@ -135,15 +135,15 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             'has_elderly_care_training',
             'elderly_care_training_certificate',
             'bio',
-            'availability'
+            # 'availability'
 
         ]
 
-    def validate_availability(self, value):
-        days = [availability['day'] for availability in value]
-        if len(days) != len(set(days)):
-            raise serializers.ValidationError("Duplicate days are not allowed in availability.")
-        return value
+    # def validate_availability(self, value):
+    #     days = [availability['day'] for availability in value]
+    #     if len(days) != len(set(days)):
+    #         raise serializers.ValidationError("Duplicate days are not allowed in availability.")
+    #     return value
 
 
 #
@@ -364,7 +364,7 @@ class SearchCriteriaSerializer(serializers.Serializer):
     min_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
     max_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
     city = serializers.ChoiceField(choices=CanadaCity, required=False)
-    experience = serializers.IntegerField(min_value=0)
+    experience = serializers.IntegerField(min_value=0,required=False)
 
     skills = serializers.MultipleChoiceField(choices=Skills.objects.all().values_list('skills', flat=True),
                                              required=False)
