@@ -63,5 +63,11 @@ class CitySerializer(serializers.Serializer):
 
 
 class LanguageSerializer(serializers.Serializer):
-    code = serializers.CharField(source='0')
-    name = serializers.CharField(source='1')
+    code = serializers.CharField()
+    name = serializers.CharField()
+
+    def to_representation(self, instance):
+        return {
+            'code': instance[0],
+            'name': instance[1],
+        }
