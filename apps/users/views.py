@@ -1,15 +1,15 @@
 from django.contrib.auth import get_user_model
 from rest_framework import generics, status
+from rest_framework import parsers
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework import parsers
+
 from apps.booking.models import Review
 from apps.booking.permissions import IsParent, IsNanny
 from apps.users import serializers, usecases
 from apps.users.filters import filter_nannies
-from apps.users.models import UserProfile
 from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer, \
     AddToFavoritesSerializer, ListUserSerializer
 
