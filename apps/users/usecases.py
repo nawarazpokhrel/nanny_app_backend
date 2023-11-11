@@ -27,9 +27,10 @@ class CreateUserProfileUseCase(BaseUseCase):
         super().__init__(serializer)
 
     def _factory(self):
+
         commitment_type = self._data.pop('commitment_type')
         skills = self._data.pop('skills')
-        availabilities = self._data.pop('availability')
+        # availabilities = self._data.pop('availability')
         experience = self._data.pop('experience')
         try:
 
@@ -47,18 +48,18 @@ class CreateUserProfileUseCase(BaseUseCase):
         user_profile.skills.add(*skills)
         user_profile.experience.add(*experience)
         user_profile.save()
-        if availabilities:
-            for availability in availabilities:
-                date = availability.get('day')
-                time_slots = availability.get('timeslots')
-                user_availability, created = UserAvailability.objects.get_or_create(
-                    user_profile=user_profile,
-                    day=date
-                )
-
-                for time_slot_data in time_slots:
-                    time_slot_name = time_slot_data.get('slug')
-                    time_slot, created = TimeSlot.objects.get_or_create(slug=time_slot_name)
-                    user_availability.timeslots.add(time_slot)
-                user_availability.save()
+        # if availabilities:
+        #     for availability in availabilities:
+        #         date = availability.get('day')
+        #         time_slots = availability.get('timeslots')
+        #         user_availability, created = UserAvailability.objects.get_or_create(
+        #             user_profile=user_profile,
+        #             day=date
+        #         )
+        #
+        #         for time_slot_data in time_slots:
+        #             time_slot_name = time_slot_data.get('slug')
+        #             time_slot, created = TimeSlot.objects.get_or_create(slug=time_slot_name)
+        #             user_availability.timeslots.add(time_slot)
+        #         user_availability.save()
 

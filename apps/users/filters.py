@@ -17,6 +17,9 @@ def filter_nannies(data):
     # Filter by commitment type
     if data.get('commitment_type'):
         queryset = queryset.filter(commitment_type__availability__in=data['commitment_type']).distinct()
+
+    if data.get('experiences_required'):
+        queryset = queryset.filter(experience__type__in=data['experiences_required']).distinct()
     if data.get('min_age') and data.get('max_age'):
         # Filter by age
         max_birth_date_for_min_age = (timezone.now() - timedelta(days=data['min_age'] * 365.25)).date()
@@ -29,10 +32,22 @@ def filter_nannies(data):
         queryset = queryset.filter(date_of_birth__gte=min_birth_date_for_max_age,
                                    date_of_birth__lt=max_birth_date_for_min_age)
 
+    if data.get('min_experience') and data.get('max_experience'):
+        # Filter by age
+
+        queryset = queryset.filter(experience__gte=data.get('min_experience'),
+                                   experience__lt=data.get('max_experience'))
+
     # Filter by city
     if data.get('city'):
         queryset = queryset.filter(
-            address__icontains=data['city'])
+            city__icontains=data['city'])
+
+    if data.get('language'):
+        queryset = queryset.filter(
+            language__icontains=data['language'])
+
+
 
     # Filter by skills
     if data.get('skills'):
@@ -40,5 +55,18 @@ def filter_nannies(data):
         for skill in data['skills']:
             q_skills |= Q(skills__skills=skill)
         queryset = queryset.filter(q_skills)
+    if data.get('has_work_permit'):
+        queryset = queryset.filter(
+            has_work_permit=data['has_work_permit'])
+        print(queryset)
+    if data.get('has_first_aid_training'):
+        queryset = queryset.filter(
+            has_first_aid_training=data['has_first_aid_training'])
+    if data.get('has_cpr_training'):
+        queryset = queryset.filter(
+            has_cpr_training=data['has_cpr_training'])
+    if data.get('has_nanny_training'):
+        queryset = queryset.filter(
+            has_nanny_training=data['has_nanny_training'])
 
     return queryset

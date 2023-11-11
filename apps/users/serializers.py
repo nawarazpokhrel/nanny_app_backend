@@ -6,9 +6,9 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from apps.booking.models import BookingDate, Review
 from apps.common import choices
-from apps.common.choices import UserRole, CanadaCity, RatingChoices
+from apps.common.choices import UserRole, CanadaCity, RatingChoices, Language
 from apps.common.utils import ChoiceField
-from apps.skills.models import TimeSlot, Skills, Availability
+from apps.skills.models import TimeSlot, Skills, Availability, Experience
 from apps.skills.serializers import ListSkillSerializer, ListAvailabilitySerializer, ListDaysSerializer, \
     ListExpectationSerializer, ChildCareNeedSerializer
 from apps.users.models import UserProfile, UserAvailability
@@ -105,9 +105,9 @@ class ListReviewSerializer(serializers.ModelSerializer):
 
 
 class CreateProfileSerializer(serializers.ModelSerializer):
-    # availability = UserAvailabilitySerializer(many=True,required=False,allow_null=True)
-    work_permit_pr = serializers.FileField()
-    first_aid_training_certificate = serializers.FileField(allow_null=True,required=False)
+    # availability = UserAvailabilitySerializer(many=True)
+    # work_permit_pr = serializers.FileField()
+    # first_aid_training_certificate = serializers.FileField(allow_null=True,required=False)
 
     class Meta:
         model = UserProfile
@@ -135,7 +135,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             'has_elderly_care_training',
             'elderly_care_training_certificate',
             'bio',
-            # 'availability'
+            # 'availability',
 
         ]
 
@@ -364,10 +364,19 @@ class SearchCriteriaSerializer(serializers.Serializer):
     min_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
     max_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
     city = serializers.ChoiceField(choices=CanadaCity, required=False)
-    experience = serializers.IntegerField(min_value=0,required=False)
+    language = serializers.ChoiceField(choices=Language.choices, required=False)
+    min_experience = serializers.IntegerField(min_value=0,required=False)
+    max_experience = serializers.IntegerField(min_value=0,required=False)
+    experiences_required = serializers.MultipleChoiceField(
+        choices=Experience.objects.all().values_list('type', flat=True),
+        required=False)
 
     skills = serializers.MultipleChoiceField(choices=Skills.objects.all().values_list('skills', flat=True),
                                              required=False)
+    has_work_permit = serializers.BooleanField(default=False)
+    has_cpr_training = serializers.BooleanField(default=False)
+    has_nanny_training = serializers.BooleanField(default=False)
+    has_elderly_care_training = serializers.BooleanField(default=False)
 
     def validate(self, data):
         min_age = data.get('min_age')
