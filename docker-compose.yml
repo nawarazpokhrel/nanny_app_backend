@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: nanny_backend
     ports:
-      - "8080:8002"
+      - "8002:8002"
     env_file:
       - .env
     depends_on:
