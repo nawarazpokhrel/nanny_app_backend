@@ -7,18 +7,18 @@ services:
       dockerfile: Dockerfile
     container_name: nanny_backend
     ports:
-      - "8002:8002"
+      - "8080:8002"
     env_file:
-      - .env  # Specify the path to your .env file
+      - .env
     depends_on:
       - db
-    links:
-      - db
+    command: ["./wait-for-it.sh", "db:5432", "--", "python", "manage.py", "runserver", "0.0.0.0:8002"]
 
   db:
-    image: postgres:latest
+    restart: always
+    image: postgres:latest  # or specify a specific version, e.g., postgres:13
     container_name: nanny_backend_db
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"

@@ -17,10 +17,9 @@ RUN pip install -r requirements.txt
 COPY . /app/
 
 # Copy the entrypoint.sh script into the container
-COPY entrypoint.sh /app/
-
-# Make the entrypoint.sh script executable
+COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
+
 
 # Expose port 8002 for the Django application
 EXPOSE 8002

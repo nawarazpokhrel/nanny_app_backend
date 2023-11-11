@@ -128,11 +128,10 @@ WSGI_APPLICATION = 'nanny_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),  # Your database name
-        'USER': env('DB_USER'),  # Your database username
-        'PASSWORD': env('DB_USER'),  # Replace with your actual database password
-        'HOST':  env('DB_HOST'),
-        'PORT': '5432',
+        'NAME': 'nannyapp',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db'
     }
 }
 
