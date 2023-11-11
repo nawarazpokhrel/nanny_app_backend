@@ -125,15 +125,24 @@ WSGI_APPLICATION = 'nanny_backend.wsgi.application'
 #     }
 # }
 
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'nannyapp',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db'
+        'NAME': env('DB_NAME'),  # Your database name
+        'USER': env('DB_USER'),  # Your database username
+        'PASSWORD': env('DB_USER'),  # Replace with your actual database password
+        'HOST':  env('DB_HOST'),
+        'PORT': '5432',
     }
 }
+
+
+
+
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

@@ -9,16 +9,17 @@ services:
     ports:
       - "8002:8002"
     env_file:
-      - .env
+      - .env  # Specify the path to your .env file
     depends_on:
       - db
-    command: ["./wait-for-it.sh", "db:5432", "--", "python", "manage.py", "runserver", "0.0.0.0:8002"]
+    links:
+      - db
 
   db:
-    restart: always
-    image: postgres:latest  # or specify a specific version, e.g., postgres:13
+    image: postgres:latest
     container_name: nanny_backend_db
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+

@@ -1,4 +1,3 @@
-# Use an official Python runtime as a parent image
 FROM python:3.8
 
 # Set environment variable for Python to run in unbuffered mode
@@ -17,12 +16,14 @@ RUN pip install -r requirements.txt
 COPY . /app/
 
 # Copy the entrypoint.sh script into the container
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+COPY entrypoint.sh /app/
 
+# Make the entrypoint.sh script executable
+RUN chmod +x /app/entrypoint.sh
 
 # Expose port 8002 for the Django application
 EXPOSE 8002
 
 # Set the entry point to your entrypoint.sh script
 ENTRYPOINT ["/app/entrypoint.sh"]
+
