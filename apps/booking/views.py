@@ -13,6 +13,7 @@ from apps.booking.models import BookingDate, Booking, Review
 from apps.booking.permissions import IsNanny, IsParent
 from apps.booking.serializers import ListBookingSerializer, AcceptBookingSerializer
 from apps.skills.models import TimeSlot, Availability
+from apps.users.serializers import ListReviewSerializer
 
 User = get_user_model()
 
@@ -218,3 +219,17 @@ class AddReviewView(generics.CreateAPIView):
             raise ValidationError({
                 'error': "No booking available for   review "
             })
+
+
+class ListMyReviewView(ListAPIView):
+    permission_classes = [IsParent, ]
+    serializer_class = ListReviewSerializer
+
+    def get_queryset(self):
+        return Review.objects.filter(user=self.request.user)
+
+    def get_serializer_context(self):
+        context =super().get_serializer_context()
+        context['request'] = self.request
+        context['class'] = "MyReview"
+        return context

@@ -26,4 +26,8 @@ urlpatterns = [
          views.AddReviewView.as_view(),
          name='add-review'
          ),
+    path('review/list',
+         views.ListMyReviewView.as_view(),
+         name='list-review'
+         ),
 ]

@@ -101,7 +101,11 @@ class ListReviewSerializer(serializers.ModelSerializer):
         ]
 
     def get_user(self, obj):
-        return ListUserSerializer(instance=obj.user, context=self.context.__dict__).data
+        print(self.context)
+        if self.context.get('class')=='MyReview':
+            return ListUserSerializer(instance=obj.user, context=self.context.get('request').__dict__).data
+        else:
+            return ListUserSerializer(instance=obj.user, context=self.context.__dict__).data
 
 
 class CreateProfileSerializer(serializers.ModelSerializer):
