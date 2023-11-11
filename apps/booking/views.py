@@ -88,7 +88,7 @@ class CreateBookingView(generics.CreateAPIView):
 
             for time_slot_data in time_slots:
                 time_slot_name = time_slot_data.get('slug')
-                time_slot, created = TimeSlot.objects.get_or_create(slug=time_slot_name)
+                time_slot, created = TimeSlot.objects.get_or_create(slugF=time_slot_name)
                 booking_date.time_slots.add(time_slot)
             booking_date.save()
 
@@ -168,11 +168,23 @@ class ListAcceptedBookingView(ListAPIView):
 
     def get_queryset(self):
         if self.request.user.role == 'P':
-            return Booking.objects.filter(status__in=['accepted', 'rejected'], parent=self.request.user,
+            return Booking.objects.filter(status__in=['accepted', 'rejected', 'pending'], parent=self.request.user,
                                           parent__role='P')
-        else:
-            return Booking.objects.filter(status__in=['accepted', 'rejected'], nanny=self.request.user,
-                                          parent__role='N')
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serialized_data = self.get_serializer(queryset, many=True).data
+        if serialized_data:
+            for item in serialized_data:
+                user_id = item.get('nanny').get('user_detail').get('id')
+                item['has_been_favorite'] = User.objects.get(pk=user_id) in self.request.user.favorites.all()
+
+        return Response(serialized_data, status=status.HTTP_200_OK)
 
 
 class AddReviewView(generics.CreateAPIView):

@@ -2,7 +2,8 @@ from rest_framework import serializers
 
 from apps.booking.models import Booking, BookingDate, Review
 from apps.skills.serializers import ChildCareNeedSerializer, ListSkillSerializer, ListAvailabilitySerializer
-from apps.users.serializers import BookingAvailabilitySerializer, ListUserSerializer, TimeSlotSerializer
+from apps.users.serializers import BookingAvailabilitySerializer, ListUserSerializer, TimeSlotSerializer, \
+    UserPersonalDetailSerializer
 
 
 class CreateBookingSerializer(serializers.ModelSerializer):
@@ -29,7 +30,8 @@ class BookingDateSerializer(serializers.ModelSerializer):
 
 class ListBookingSerializer(serializers.ModelSerializer):
     care_needs = ChildCareNeedSerializer(many=True)
-    parent = ListUserSerializer()
+    parent = serializers.SerializerMethodField()
+    nanny = serializers.SerializerMethodField()
     commitment = ListAvailabilitySerializer()
     expectations = ListSkillSerializer(many=True)
     GENDER_CHOICES = (
@@ -44,6 +46,7 @@ class ListBookingSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'parent',
+            'nanny',
             'care_needs',
             'expectations',
             'additional_message',
@@ -51,6 +54,13 @@ class ListBookingSerializer(serializers.ModelSerializer):
             'status',
             'booking_dates'
         ]
+
+
+    def get_parent(self, obj):
+        return ListUserSerializer(instance=obj.parent, context=self.context.get('request').__dict__).data
+
+    def get_nanny(self,obj):
+        return UserPersonalDetailSerializer(instance=obj.nanny, context=self.context).data
 
 
 class AcceptBookingSerializer(serializers.ModelSerializer):
@@ -69,4 +79,3 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ['rating', 'message']
         model = Review
-
