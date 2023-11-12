@@ -361,21 +361,21 @@ class AddToFavoritesSerializer(serializers.ModelSerializer):
 
 
 class SearchCriteriaSerializer(serializers.Serializer):
-    # commitment_type = serializers.MultipleChoiceField(
-    #     choices=Availability.objects.all().values_list('availability', flat=True),
-    #     required=False)
+    commitment_type = serializers.MultipleChoiceField(
+        choices=Availability.objects.all().values_list('availability', flat=True),
+        required=False)
     min_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
     max_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
     city = serializers.ChoiceField(choices=CanadaCity, required=False)
     language = serializers.ChoiceField(choices=Language.choices, required=False)
     min_experience = serializers.IntegerField(min_value=0,required=False)
     max_experience = serializers.IntegerField(min_value=0,required=False)
-    # experiences_required = serializers.MultipleChoiceField(
-    #     choices=Experience.objects.all().values_list('type', flat=True),
-    #     required=False)
+    experiences_required = serializers.MultipleChoiceField(
+        choices=Experience.objects.all().values_list('type', flat=True),
+        required=False)
 
-    # skills = serializers.MultipleChoiceField(choices=Skills.objects.all().values_list('skills', flat=True),
-    #                                          required=False)
+    skills = serializers.MultipleChoiceField(choices=Skills.objects.all().values_list('skills', flat=True),
+                                             required=False)
     has_work_permit = serializers.BooleanField(default=False)
     has_cpr_training = serializers.BooleanField(default=False)
     has_nanny_training = serializers.BooleanField(default=False)
