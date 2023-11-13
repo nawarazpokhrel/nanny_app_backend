@@ -27,7 +27,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Take environment variables from .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-
 from django.conf import settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,7 +40,6 @@ DEBUG = env('DEBUG')
 # Raises Django's ImproperlyConfigured
 # exception if SECRET_KEY not in os.environ
 SECRET_KEY = env('SECRET_KEY')
-
 
 ALLOWED_HOSTS = ['*']
 
@@ -126,23 +124,19 @@ WSGI_APPLICATION = 'nanny_backend.wsgi.application'
 # }
 
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': env('DB_NAME'),  # Your database name
         'USER': env('DB_USER'),  # Your database username
-        'PASSWORD': env('DB_USER'),  # Replace with your actual database password
+        'PASSWORD': env('DB_PASSWORD'),  # Replace with your actual database password
         'HOST':  env('DB_HOST'),
         'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',
+        }
     }
 }
-
-
-
-
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
