@@ -255,7 +255,7 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
     review_stats = serializers.SerializerMethodField()
 
     personal_detail = UserPersonalProfileSerializer(source='userprofile')
-
+    has_user_profile = serializers.BooleanField()
     review = serializers.SerializerMethodField()
 
     class Meta:
@@ -264,7 +264,8 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
             'user_detail',
             'personal_detail',
             'review',
-            'review_stats'
+            'review_stats',
+            'has_user_profile'
         ]
 
     def get_user_detail(self, obj):
@@ -396,7 +397,7 @@ class SearchCriteriaSerializer(serializers.Serializer):
 
 
 class UserPersonalProfileViaUserSerializer(serializers.ModelSerializer):
-    personal_detail = UserPersonalProfileSerializer(source='userprofile',many=True)
+    personal_detail = UserPersonalProfileSerializer(source='userprofile', many=True)
     GENDER_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),
@@ -409,4 +410,3 @@ class UserPersonalProfileViaUserSerializer(serializers.ModelSerializer):
             'id',
             'personal_detail',
         ]
-
