@@ -397,7 +397,7 @@ class SearchCriteriaSerializer(serializers.Serializer):
 
 
 class UserPersonalProfileViaUserSerializer(serializers.ModelSerializer):
-    personal_detail = UserPersonalProfileSerializer(source='userprofile', many=True)
+    personal_detail = serializers.SerializerMethodField()
     GENDER_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),
@@ -410,3 +410,12 @@ class UserPersonalProfileViaUserSerializer(serializers.ModelSerializer):
             'id',
             'personal_detail',
         ]
+
+    def get_personal_detail(self, obj):
+        try:
+            user_profile = obj.userprofile
+            if user_profile:
+                return UserPersonalProfileSerializer(user_profile, context=self.context).data
+            return None
+        except UserProfile.DoesNotExist:
+            return None

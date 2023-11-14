@@ -179,15 +179,15 @@ class ListFavoritesView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
+        print(queryset)
         serialized_data = []
 
         for favorite_user in queryset:
-            user_profile = favorite_user.userprofile
-            serialized_user_profile = serializers.UserPersonalProfileSerializer(user_profile, context=
+            instance = User.objects.get(pk=favorite_user.id)
+            serialized_user_profile = serializers.UserPersonalProfileViaUserSerializer(instance, context=
             {"request": self.request, "class": "Favourites"}).data
-            serialized_user_profile['has_been_favorite'] = User.objects.get(pk=favorite_user.id) in self.request.user.favorites.all()
+            serialized_user_profile['has_been_favorite'] = instance in self.request.user.favorites.all()
             serialized_data.append(serialized_user_profile)
-
         return Response(serialized_data, status=status.HTTP_200_OK)
 
 
