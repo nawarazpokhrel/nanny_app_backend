@@ -33,15 +33,14 @@ class CreateUserProfileUseCase(BaseUseCase):
 
         commitment_type = self._data.pop('commitment_type')
         work_permit_pr = self._data.pop('work_permit_pr')
-        first_aid_training_certificate = self._data.pop('first_aid_training_certificate')
-        cpr_training_certificate = self._data.pop('cpr_training_certificate')
-        elderly_care_training_certificate = self._data.pop('elderly_care_training_certificate')
-        nanny_training_certificate = self._data.pop('nanny_training_certificate')
+        # first_aid_training_certificate = self._data.pop('first_aid_training_certificate')
+        # cpr_training_certificate = self._data.pop('cpr_training_certificate')
+        # elderly_care_training_certificate = self._data.pop('elderly_care_training_certificate')
+        # nanny_training_certificate = self._data.pop('nanny_training_certificate')
         skills = self._data.pop('skills')
         availabilities = self._data.pop('availability')
         experience = self._data.pop('experience')
         try:
-
             user_profile = UserProfile(**self._data, user=self._user)
 
             user_profile.save()
@@ -61,45 +60,45 @@ class CreateUserProfileUseCase(BaseUseCase):
             ext = format.split('/')[-1]  # Get the file extension
             data = ContentFile(base64.b64decode(imgstr), name=f"{user_profile.id}_work_permit.{ext}")
             user_profile.work_permit_pr.save(data.name, data)
-        if first_aid_training_certificate:
-            try:
-                format, pdf_data = first_aid_training_certificate.split(';base64,')  # Try splitting with ';base64,'
-            except ValueError:
-                pdf_data = first_aid_training_certificate  # Use the whole string as data if splitting fails
-
-            ext = "pdf"  # PDF file extension
-            data = ContentFile(base64.b64decode(pdf_data), name=f"{user_profile.id}_first_aid_training_certificate.{ext}")
-            user_profile.first_aid_training_certificate.save(data.name, data)
-        if cpr_training_certificate:
-            try:
-                format, pdf_data = cpr_training_certificate.split(';base64,')  # Try splitting with ';base64,'
-            except ValueError:
-                pdf_data = cpr_training_certificate  # Use the whole string as data if splitting fails
-
-            ext = "pdf"  # PDF file extension
-            data = ContentFile(base64.b64decode(pdf_data),
-                               name=f"{user_profile.id}_cpr_training_certificate.{ext}")
-            user_profile.cpr_training_certificate.save(data.name, data)
-        if nanny_training_certificate:
-            try:
-                format, pdf_data = nanny_training_certificate.split(';base64,')  # Try splitting with ';base64,'
-            except ValueError:
-                pdf_data = nanny_training_certificate  # Use the whole string as data if splitting fails
-
-            ext = "pdf"  # PDF file extension
-            data = ContentFile(base64.b64decode(pdf_data),
-                               name=f"{user_profile.id}_nanny_training_certificate.{ext}")
-            user_profile.nanny_training_certificate.save(data.name, data)
-        if elderly_care_training_certificate:
-            try:
-                format, pdf_data = elderly_care_training_certificate.split(';base64,')  # Try splitting with ';base64,'
-            except ValueError:
-                pdf_data = elderly_care_training_certificate  # Use the whole string as data if splitting fails
-
-            ext = "pdf"  # PDF file extension
-            data = ContentFile(base64.b64decode(pdf_data),
-                               name=f"{user_profile.id}_elderly_care_training_certificate.{ext}")
-            user_profile.elderly_care_training_certificate.save(data.name, data)
+        # if first_aid_training_certificate:
+        #     try:
+        #         format, pdf_data = first_aid_training_certificate.split(';base64,')  # Try splitting with ';base64,'
+        #     except ValueError:
+        #         pdf_data = first_aid_training_certificate  # Use the whole string as data if splitting fails
+        #
+        #     ext = "pdf"  # PDF file extension
+        #     data = ContentFile(base64.b64decode(pdf_data), name=f"{user_profile.id}_first_aid_training_certificate.{ext}")
+        #     user_profile.first_aid_training_certificate.save(data.name, data)
+        # if cpr_training_certificate:
+        #     try:
+        #         format, pdf_data = cpr_training_certificate.split(';base64,')  # Try splitting with ';base64,'
+        #     except ValueError:
+        #         pdf_data = cpr_training_certificate  # Use the whole string as data if splitting fails
+        #
+        #     ext = "pdf"  # PDF file extension
+        #     data = ContentFile(base64.b64decode(pdf_data),
+        #                        name=f"{user_profile.id}_cpr_training_certificate.{ext}")
+        #     user_profile.cpr_training_certificate.save(data.name, data)
+        # if nanny_training_certificate:
+        #     try:
+        #         format, pdf_data = nanny_training_certificate.split(';base64,')  # Try splitting with ';base64,'
+        #     except ValueError:
+        #         pdf_data = nanny_training_certificate  # Use the whole string as data if splitting fails
+        #
+        #     ext = "pdf"  # PDF file extension
+        #     data = ContentFile(base64.b64decode(pdf_data),
+        #                        name=f"{user_profile.id}_nanny_training_certificate.{ext}")
+        #     user_profile.nanny_training_certificate.save(data.name, data)
+        # if elderly_care_training_certificate:
+        #     try:
+        #         format, pdf_data = elderly_care_training_certificate.split(';base64,')  # Try splitting with ';base64,'
+        #     except ValueError:
+        #         pdf_data = elderly_care_training_certificate  # Use the whole string as data if splitting fails
+        #
+        #     ext = "pdf"  # PDF file extension
+        #     data = ContentFile(base64.b64decode(pdf_data),
+        #                        name=f"{user_profile.id}_elderly_care_training_certificate.{ext}")
+        #     user_profile.elderly_care_training_certificate.save(data.name, data)
         if availabilities:
             for availability in availabilities:
                 date = availability.get('day')

@@ -111,10 +111,10 @@ class ListReviewSerializer(serializers.ModelSerializer):
 class CreateProfileSerializer(serializers.ModelSerializer):
     availability = UserAvailabilitySerializer(many=True)
     work_permit_pr = serializers.CharField(allow_null=True, required=False)
-    first_aid_training_certificate = serializers.CharField(allow_null=True, required=False)
-    cpr_training_certificate = serializers.CharField(allow_null=True, required=False)
-    nanny_training_certificate = serializers.CharField(allow_null=True, required=False)
-    elderly_care_training_certificate = serializers.CharField(allow_null=True, required=False)
+    # first_aid_training_certificate = serializers.CharField(allow_null=True, required=False)
+    # cpr_training_certificate = serializers.CharField(allow_null=True, required=False)
+    # nanny_training_certificate = serializers.CharField(allow_null=True, required=False)
+    # elderly_care_training_certificate = serializers.CharField(allow_null=True, required=False)
 
     class Meta:
         model = UserProfile
@@ -133,14 +133,14 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             'skills',
             'has_work_permit',
             'work_permit_pr',
-            'has_first_aid_training',
-            'first_aid_training_certificate',
-            'has_cpr_training',
-            'cpr_training_certificate',
-            'has_nanny_training',
-            'nanny_training_certificate',
-            'has_elderly_care_training',
-            'elderly_care_training_certificate',
+            # 'has_first_aid_training',
+            # 'first_aid_training_certificate',
+            # 'has_cpr_training',
+            # 'cpr_training_certificate',
+            # 'has_nanny_training',
+            # 'nanny_training_certificate',
+            # 'has_elderly_care_training',
+            # 'elderly_care_training_certificate',
             'bio',
             'availability',
 
