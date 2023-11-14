@@ -75,6 +75,7 @@ class TimeSlotSerializer(serializers.ModelSerializer):
 
 class UserAvailabilitySerializer(serializers.ModelSerializer):
     timeslots = TimeSlotSerializer(many=True)
+    day = serializers.CharField()
 
     class Meta:
         model = UserAvailability
@@ -205,6 +206,8 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
     )
     gender = ChoiceField(choices=GENDER_CHOICES)
     country = ChoiceField(choices=choices.COUNTRY_CHOICES)
+    city = ChoiceField(choices=choices.CanadaCity.choices)
+    language = ChoiceField(choices=choices.Language.choices)
     availability = UserAvailabilitySerializer(source='useravailability_set', many=True)
     role = serializers.CharField(source='user.role')
     rating = serializers.FloatField(source='user.average_rating')
