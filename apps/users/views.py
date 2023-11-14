@@ -169,7 +169,7 @@ class ListFavoritesView(generics.ListAPIView):
     permission_classes = [IsParent]
 
     def get_queryset(self):
-        return self.request.user.favorites.filter(role='N').all()
+        return self.request.user.favorites.filter(role='N').all().order_by('-id')
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -179,7 +179,6 @@ class ListFavoritesView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        print(queryset)
         serialized_data = []
 
         for favorite_user in queryset:
