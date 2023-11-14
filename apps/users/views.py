@@ -10,6 +10,7 @@ from apps.booking.models import Review
 from apps.booking.permissions import IsParent, IsNanny
 from apps.users import serializers, usecases
 from apps.users.filters import filter_nannies
+from apps.users.models import UserProfile
 from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer, \
     AddToFavoritesSerializer, ListUserSerializer
 
@@ -71,6 +72,7 @@ class UserDetailView(generics.RetrieveAPIView):
 class CreateUserProfileView(generics.CreateAPIView):
     serializer_class = CreateProfileSerializer
     permission_classes = [IsNanny, ]
+
     # parser_classes = (parsers.MultiPartParser,)
 
     def perform_create(self, serializer):
@@ -163,11 +165,11 @@ class AddToFavoritesView(generics.CreateAPIView):
 
 
 class ListFavoritesView(generics.ListAPIView):
-    serializer_class = ListUserSerializer
+    serializer_class = serializers.UserPersonalProfileViaUserSerializer
     permission_classes = [IsParent]
 
     def get_queryset(self):
-        return self.request.user.favorites.all()
+        return self.request.user.favorites.filter(role='N').all()
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -177,10 +179,14 @@ class ListFavoritesView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serialized_data = self.get_serializer(queryset, many=True).data
-        for item in serialized_data:
-            user_id = item.get('id')
-            item['has_been_favorite'] = User.objects.get(pk=user_id) in self.request.user.favorites.all()
+        serialized_data = []
+
+        for favorite_user in queryset:
+            user_profile = favorite_user.userprofile
+            serialized_user_profile = serializers.UserPersonalProfileSerializer(user_profile, context=
+            {"request": self.request, "class": "Favourites"}).data
+            serialized_user_profile['has_been_favorite'] = User.objects.get(pk=favorite_user.id) in self.request.user.favorites.all()
+            serialized_data.append(serialized_user_profile)
 
         return Response(serialized_data, status=status.HTTP_200_OK)
 
@@ -250,5 +256,3 @@ class RemoveFavoritesView(generics.CreateAPIView):
             "status": status.HTTP_201_CREATED
         }
         return Response(data)
-
-

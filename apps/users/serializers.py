@@ -67,6 +67,7 @@ class ListUserSerializer(serializers.ModelSerializer):
 class TimeSlotSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=False)
     slug = serializers.CharField(allow_null=False)
+
     class Meta:
         model = TimeSlot
         fields = ('id', 'name', 'timeslot_value', 'slug')
@@ -101,7 +102,7 @@ class ListReviewSerializer(serializers.ModelSerializer):
         ]
 
     def get_user(self, obj):
-        if self.context.get('class')=='MyReview':
+        if self.context.get('class') == 'MyReview':
             return ListUserSerializer(instance=obj.user, context=self.context.get('request').__dict__).data
         else:
             return ListUserSerializer(instance=obj.user, context=self.context.__dict__).data
@@ -110,10 +111,10 @@ class ListReviewSerializer(serializers.ModelSerializer):
 class CreateProfileSerializer(serializers.ModelSerializer):
     availability = UserAvailabilitySerializer(many=True)
     work_permit_pr = serializers.CharField(allow_null=True, required=False)
-    first_aid_training_certificate = serializers.CharField(allow_null=True,required=False)
-    cpr_training_certificate = serializers.CharField(allow_null=True,required=False)
-    nanny_training_certificate = serializers.CharField(allow_null=True,required=False)
-    elderly_care_training_certificate = serializers.CharField(allow_null=True,required=False)
+    first_aid_training_certificate = serializers.CharField(allow_null=True, required=False)
+    cpr_training_certificate = serializers.CharField(allow_null=True, required=False)
+    nanny_training_certificate = serializers.CharField(allow_null=True, required=False)
+    elderly_care_training_certificate = serializers.CharField(allow_null=True, required=False)
 
     class Meta:
         model = UserProfile
@@ -244,7 +245,6 @@ class UserPersonalProfileSerializer(serializers.ModelSerializer):
         ]
 
     def get_user_detail(self, obj):
-        # print(self.context)
         return ListUserSerializer(instance=obj.user, context=self.context.get('request').__dict__).data
 
 
@@ -301,7 +301,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         user_ob = User.objects.get(phone_number=self.user.phone_number)
         if user_ob.role != role:
             raise serializers.ValidationError({
-                'error':'Role does not match.'
+                'error': 'Role does not match.'
             })
         user_data = AuthUserDetailSerializer(user_ob).data
         data["user"] = user_data
@@ -371,8 +371,8 @@ class SearchCriteriaSerializer(serializers.Serializer):
     max_age = serializers.IntegerField(min_value=0, max_value=120, required=False)
     city = serializers.ChoiceField(choices=CanadaCity, required=False)
     language = serializers.ChoiceField(choices=Language.choices, required=False)
-    min_experience = serializers.IntegerField(min_value=0,required=False)
-    max_experience = serializers.IntegerField(min_value=0,required=False)
+    min_experience = serializers.IntegerField(min_value=0, required=False)
+    max_experience = serializers.IntegerField(min_value=0, required=False)
     experiences_required = serializers.MultipleChoiceField(
         choices=Experience.objects.all().values_list('type', flat=True),
         required=False)
@@ -391,3 +391,20 @@ class SearchCriteriaSerializer(serializers.Serializer):
         if min_age and max_age and min_age >= max_age:
             raise serializers.ValidationError("Minimum age must be less than maximum age.")
         return data
+
+
+class UserPersonalProfileViaUserSerializer(serializers.ModelSerializer):
+    personal_detail = UserPersonalProfileSerializer(source='userprofile',many=True)
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', 'Other'),
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'personal_detail',
+        ]
+
