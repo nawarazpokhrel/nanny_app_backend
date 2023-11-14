@@ -129,3 +129,4 @@ class UserAvailability(BaseModel):
     def __str__(self):
         time_slots = ", ".join([slot.name for slot in self.timeslots.all()])
         return f"{self.user_profile.user.fullname} -> {self.day.day_name} -> {time_slots}"
+

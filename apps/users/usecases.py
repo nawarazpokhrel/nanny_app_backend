@@ -55,21 +55,20 @@ class CreateUserProfileUseCase(BaseUseCase):
                 # Decode base64 string to binary data
                 binary_data = base64.b64decode(work_permit_pr)
                 file_content = ContentFile(binary_data)
-                user_profile.work_permit_pr.save(f'{user_profile.user.fullname}_work-permit.pdf', file_content,
-                                                 save=True)
+                user_profile.work_permit_pr.save(f'{user_profile.user.fullname}_work-permit.pdf', file_content)
 
                 if self.cpr_training_certificate:
 
                     binary_data = base64.b64decode(self.cpr_training_certificate)
                     file_content = ContentFile(binary_data)
                     user_profile.cpr_training_certificate.save(f'{user_profile.user.fullname}cpr_training_certificate.pdf', file_content,
-                                                     save=True)
+                                                     )
                 if self.elderly_care_training_certificate:
 
                     binary_data = base64.b64decode(self.elderly_care_training_certificate)
                     file_content = ContentFile(binary_data)
                     user_profile.elderly_care_training_certificate.save(f'{user_profile.user.fullname}elderly_care_training_certificate.pdf', file_content,
-                                                     save=True)
+                                                     )
                 if self.nanny_training_certificate:
 
                     binary_data = base64.b64decode(self.nanny_training_certificate)

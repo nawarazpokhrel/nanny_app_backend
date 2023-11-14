@@ -75,11 +75,11 @@ class TimeSlotSerializer(serializers.ModelSerializer):
 
 class UserAvailabilitySerializer(serializers.ModelSerializer):
     timeslots = TimeSlotSerializer(many=True)
-    day = serializers.CharField()
+    day_full_name = serializers.CharField(required=False,allow_null=True, source='day.day_value',read_only=True)
 
     class Meta:
         model = UserAvailability
-        fields = ('day', 'timeslots')
+        fields = ('day', 'timeslots', 'day_full_name')
 
 
 class IndividualRatingDetailSerializer(serializers.Serializer):
