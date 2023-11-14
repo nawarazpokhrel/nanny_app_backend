@@ -14,12 +14,16 @@ def filter_nannies(data):
     # Start with all users with the nanny role
     queryset = UserProfile.objects.filter(user__role=UserRole.NANNY)
 
+
     # Filter by commitment type
     if data.get('commitment_type'):
-        queryset = queryset.filter(commitment_type__availability__in=data['commitment_type']).distinct()
+        commitment_type_list = list(data['commitment_type'])
+        queryset = queryset.filter(commitment_type__id__in=commitment_type_list).distinct()
 
+        # Filter by experiences_required
     if data.get('experiences_required'):
-        queryset = queryset.filter(experience__type__in=data['experiences_required']).distinct()
+        experiences_required_list = list(data['experiences_required'])
+        queryset = queryset.filter(experience__id__in=experiences_required_list).distinct()
     if data.get('min_age') and data.get('max_age'):
         # Filter by age
         max_birth_date_for_min_age = (timezone.now() - timedelta(days=data['min_age'] * 365.25)).date()
@@ -51,10 +55,12 @@ def filter_nannies(data):
 
     # Filter by skills
     if data.get('skills'):
+        skills_list = list(data['skills'])
         q_skills = Q()
-        for skill in data['skills']:
-            q_skills |= Q(skills__skills=skill)
+        for skill in skills_list:
+            q_skills |= Q(skills__id=skill)
         queryset = queryset.filter(q_skills)
+
     if data.get('has_work_permit'):
         queryset = queryset.filter(
             has_work_permit=data['has_work_permit'])
