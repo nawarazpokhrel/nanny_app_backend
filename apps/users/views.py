@@ -117,6 +117,8 @@ class UserPersonalDetailView(generics.RetrieveAPIView):
         reviews = Review.objects.filter(booking__nanny=user)
         context = super().get_serializer_context()
         context['request'] = self.request
+        context['user_id'] = self.kwargs.get('user_id')
+        context['requesting_user'] = self.request.user
 
         context['reviews'] = reviews
         return context
@@ -176,18 +178,6 @@ class ListFavoritesView(generics.ListAPIView):
         context['request'] = self.request
         context['class'] = 'USER'
         return context
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serialized_data = []
-
-        for favorite_user in queryset:
-            instance = User.objects.get(pk=favorite_user.id)
-            serialized_user_profile = serializers.UserPersonalProfileViaUserSerializer(instance, context=
-            {"request": self.request, "class": "Favourites"}).data
-            serialized_user_profile['has_been_favorite'] = instance in self.request.user.favorites.all()
-            serialized_data.append(serialized_user_profile)
-        return Response(serialized_data, status=status.HTTP_200_OK)
 
 
 class NannySearchView(generics.CreateAPIView):

@@ -14,7 +14,6 @@ def filter_nannies(data):
     # Start with all users with the nanny role
     queryset = UserProfile.objects.filter(user__role=UserRole.NANNY)
 
-
     # Filter by commitment type
     if data.get('commitment_type'):
         commitment_type_list = list(data['commitment_type'])
@@ -50,8 +49,6 @@ def filter_nannies(data):
     if data.get('language'):
         queryset = queryset.filter(
             language__icontains=data['language'])
-
-
 
     # Filter by skills
     if data.get('skills'):

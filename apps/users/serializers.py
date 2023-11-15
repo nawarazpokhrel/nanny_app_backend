@@ -75,7 +75,7 @@ class TimeSlotSerializer(serializers.ModelSerializer):
 
 class UserAvailabilitySerializer(serializers.ModelSerializer):
     timeslots = TimeSlotSerializer(many=True)
-    day_full_name = serializers.CharField(required=False,allow_null=True, source='day.day_value',read_only=True)
+    day_full_name = serializers.CharField(required=False, allow_null=True, source='day.day_value', read_only=True)
 
     class Meta:
         model = UserAvailability
@@ -257,6 +257,7 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
     personal_detail = UserPersonalProfileSerializer(source='userprofile')
     has_user_profile = serializers.BooleanField()
     review = serializers.SerializerMethodField()
+    has_been_favorite = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -265,7 +266,8 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
             'personal_detail',
             'review',
             'review_stats',
-            'has_user_profile'
+            'has_user_profile',
+            'has_been_favorite'
         ]
 
     def get_user_detail(self, obj):
@@ -274,6 +276,15 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
     def get_review(self, obj):
         reviews = self.context.get('reviews', [])
         return ListReviewSerializer(reviews, many=True, context=self.context.get('request')).data
+
+    def get_has_been_favorite(self, obj):
+        user_id = (self.context.get('user_id'))
+        requesting_user = (self.context.get('requesting_user'))
+        user = User.objects.filter(id=user_id).first()
+
+        if user in requesting_user.favorites.all():
+            return True
+        return False
 
     def get_review_stats(self, obj):
         reviews = self.context.get('reviews', [])
