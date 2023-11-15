@@ -281,9 +281,10 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
         user_id = (self.context.get('user_id'))
         requesting_user = (self.context.get('requesting_user'))
         user = User.objects.filter(id=user_id).first()
+        if user:
 
-        if user in requesting_user.favorites.all():
-            return True
+            if user in requesting_user.favorites.all():
+                return True
         return False
 
     def get_review_stats(self, obj):
