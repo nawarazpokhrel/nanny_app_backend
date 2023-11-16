@@ -282,7 +282,6 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
         requesting_user = (self.context.get('requesting_user'))
         user = User.objects.filter(id=user_id).first()
         if user:
-
             if user in requesting_user.favorites.all():
                 return True
         return False

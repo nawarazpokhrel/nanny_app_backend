@@ -55,11 +55,10 @@ class ListBookingSerializer(serializers.ModelSerializer):
             'booking_dates'
         ]
 
-
     def get_parent(self, obj):
         return ListUserSerializer(instance=obj.parent, context=self.context.get('request').__dict__).data
 
-    def get_nanny(self,obj):
+    def get_nanny(self, obj):
         return UserPersonalDetailSerializer(instance=obj.nanny, context=self.context).data
 
 

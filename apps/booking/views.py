@@ -89,7 +89,7 @@ class CreateBookingView(generics.CreateAPIView):
 
             for time_slot_data in time_slots:
                 time_slot_name = time_slot_data.get('slug')
-                time_slot, created = TimeSlot.objects.get_or_create(slugF=time_slot_name)
+                time_slot, created = TimeSlot.objects.get_or_create(slug=time_slot_name)
                 booking_date.time_slots.add(time_slot)
             booking_date.save()
 
