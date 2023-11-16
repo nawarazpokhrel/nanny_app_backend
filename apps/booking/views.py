@@ -5,7 +5,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db import IntegrityError
+from django.db import IntegrityError,transaction
 
 from apps.booking import serializers
 from apps.booking.filters import BookingFilter
@@ -39,6 +39,7 @@ class CreateBookingView(generics.CreateAPIView):
                 {'error': 'user does not exist for following id.'}
             )
 
+    @transaction.atomic
     def perform_create(self, serializer):
         commitment_type = serializer.validated_data.pop('commitment')
         parent = self.request.user
@@ -74,10 +75,8 @@ class CreateBookingView(generics.CreateAPIView):
                 commitment=commitment_type,
             )
             booking.save()
-
-        booking.expectations.add(*expectations)
-        booking.care_needs.add(*care_needs)
-        booking.save()
+            booking.expectations.add(*expectations)
+            booking.care_needs.add(*care_needs)
         for availability in availabilities:
             # days = availability.get('day')
             extracted_date = availability.get('date')
@@ -89,9 +88,11 @@ class CreateBookingView(generics.CreateAPIView):
 
             for time_slot_data in time_slots:
                 time_slot_name = time_slot_data.get('slug')
-                time_slot, created = TimeSlot.objects.get_or_create(slug=time_slot_name)
-                booking_date.time_slots.add(time_slot)
-            booking_date.save()
+                time_slot = TimeSlot.objects.filter(slug=time_slot_name).first()
+                if time_slot:
+                    booking_date.time_slots.add(time_slot)
+                else:
+                    raise ValidationError({'error':'time_slot slug not found'})
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
