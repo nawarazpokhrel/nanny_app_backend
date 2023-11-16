@@ -56,9 +56,6 @@ class ListUserSerializer(serializers.ModelSerializer):
         if self.context.get('class') == 'USER':
             context = self.context.get('request').__dict__
             request = context.get('parser_context').get('request')
-        elif self.context.get('class') == 'BookingHistory':
-            context = self.context.get('request').__dict__
-            request = context.get('parser_context').get('request')
         else:
             request = self.context.get('parser_context').get('request')
         if request and obj.avatar:
