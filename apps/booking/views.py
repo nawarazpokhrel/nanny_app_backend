@@ -5,7 +5,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db import IntegrityError,transaction
+from django.db import IntegrityError, transaction
 
 from apps.booking import serializers
 from apps.booking.filters import BookingFilter
@@ -13,7 +13,7 @@ from apps.booking.models import BookingDate, Booking, Review
 from apps.booking.permissions import IsNanny, IsParent
 from apps.booking.serializers import ListBookingSerializer, AcceptBookingSerializer
 from apps.skills.models import TimeSlot, Availability
-from apps.users.serializers import ListReviewSerializer
+from apps.users.serializers import ListReviewSerializer, UserPaymentSerializer
 
 User = get_user_model()
 
@@ -63,7 +63,7 @@ class CreateBookingView(generics.CreateAPIView):
 
         if booking:
             raise ValidationError({
-                'error': 'Cannot make next booking until your request is accepted by this nanny.'
+                'error': 'Cannot make next booking until your request is accepted or rejected by this nanny.'
             }
             )
         else:
@@ -92,7 +92,7 @@ class CreateBookingView(generics.CreateAPIView):
                 if time_slot:
                     booking_date.time_slots.add(time_slot)
                 else:
-                    raise ValidationError({'error':'time_slot slug not found'})
+                    raise ValidationError({'error': 'time_slot slug not found'})
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -137,7 +137,7 @@ class ListBookingView(ListAPIView):
     serializer_class = ListBookingSerializer
 
     def get_queryset(self):
-        return Booking.objects.filter(nanny=self.request.user)
+        return Booking.objects.filter(nanny=self.request.user, status='pending')
 
 
 class AcceptBookingView(generics.CreateAPIView):
@@ -159,29 +159,48 @@ class AcceptBookingView(generics.CreateAPIView):
         booking.status = serializer.validated_data.get('status')
         booking.save()
 
-        # send notification
 
-
-class ListAcceptedBookingView(ListAPIView):
+class ListBookingHistoryView(ListAPIView):
     permission_classes = [IsAuthenticated, ]
-    serializer_class = ListBookingSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = BookingFilter
 
-    def get_queryset(self):
+    def get_serializer_class(self):
         if self.request.user.role == 'P':
-            return Booking.objects.filter(status__in=['accepted', 'rejected', 'pending'], parent=self.request.user,
-                                          parent__role='P')
+            return ListBookingSerializer
+        elif self.request.user.role == 'N':
+            return UserPaymentSerializer
+
+    def get_queryset(self):
+        queryset = Booking.objects.filter(status__in=['accepted', 'rejected', 'pending'])
+
+        # Apply custom filters based on user role
+        if self.request.user.role == 'P':
+            queryset = queryset.filter(parent=self.request.user, parent__role='P')
+        elif self.request.user.role == 'N':
+            queryset = queryset.filter(nanny=self.request.user, nanny__role='N')
+
+        # Apply search by parent's full name
+        full_name_search = self.request.query_params.get('fullname', None)
+        if full_name_search and self.request.user.role == 'N':
+            queryset = queryset.filter(parent__fullname__icontains=full_name_search)
+            return queryset
+        if (full_name_search and self.request.user.role == 'P'):
+            queryset = queryset.filter(nanny__fullname__icontains=full_name_search)
+            return queryset
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
+        context['class'] = 'BookingHistory'
         context['request'] = self.request
         return context
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serialized_data = self.get_serializer(queryset, many=True).data
-        if serialized_data:
+        serializer_class = self.get_serializer_class()
+        serialized_data = serializer_class(queryset, many=True, context={'request': request}).data
+
+        if serialized_data and self.request.user.role == 'P':
             for item in serialized_data:
                 user_id = item.get('nanny').get('user_detail').get('id')
                 item['has_been_favorite'] = User.objects.get(pk=user_id) in self.request.user.favorites.all()
@@ -230,7 +249,7 @@ class ListMyReviewView(ListAPIView):
         return Review.objects.filter(user=self.request.user)
 
     def get_serializer_context(self):
-        context =super().get_serializer_context()
+        context = super().get_serializer_context()
         context['request'] = self.request
         context['class'] = "MyReview"
         return context

@@ -56,6 +56,9 @@ class ListUserSerializer(serializers.ModelSerializer):
         if self.context.get('class') == 'USER':
             context = self.context.get('request').__dict__
             request = context.get('parser_context').get('request')
+        elif self.context.get('class') == 'BookingHistory':
+            context = self.context.get('request').__dict__
+            request = context.get('parser_context').get('request')
         else:
             request = self.context.get('parser_context').get('request')
         if request and obj.avatar:
@@ -430,3 +433,21 @@ class UserPersonalProfileViaUserSerializer(serializers.ModelSerializer):
             return None
         except UserProfile.DoesNotExist:
             return None
+
+
+class UserPaymentSerializer(serializers.ModelSerializer):
+    parent_detail = serializers.SerializerMethodField()
+    has_paid = serializers.BooleanField(source='parent.has_paid')
+    total_amount = serializers.FloatField(source='parent.total_amount')
+
+    class Meta:
+        from apps.booking.models import Booking
+        model = Booking
+        fields = [
+            'parent_detail',
+            'has_paid',
+            'total_amount'
+        ]
+    def get_parent_detail(self, obj):
+        return ListUserSerializer(instance=obj.parent,context=self.context.get('request').__dict__).data
+

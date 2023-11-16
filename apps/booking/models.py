@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Count, Sum
+
 from django.utils import timezone
 from apps.common.choices import RatingChoices
 from apps.common.models import BaseModel
@@ -25,41 +27,82 @@ class Booking(BaseModel):
     status = models.CharField(choices=STATUS_CHOICES, default='pending', max_length=10)
 
     def __str__(self):
-        print(self.calculate_payment())
         return f"Booking #{self.id} - {self.parent.fullname} to {self.nanny.fullname}"
 
+
     def clean(self):
-        if self.parent.role == 'N':
-            raise ValidationError(
-                {
-                    'parent': "Parent  cannot  to be Nanny"
-                }
+        if self.parent:
+            if self.parent.role == 'N':
+                raise ValidationError(
+                    {
+                        'parent': "Parent  cannot  to be Nanny"
+                    }
+                )
+        if self.nanny:
+            if self.nanny.role == 'P':
+                raise ValidationError(
+                    {
+                        'nanny': "Nanny   cannot  to be parent"
+                    }
+                )
+        booking = Booking.objects.filter(
+            parent=self.parent,
+            nanny=self.nanny,
+            status='pending'
+        ).exists()
+        if booking:
+            raise ValidationError({
+                'status': 'Cannot make next booking until your request is accepted or rejected by this nanny.'
+            }
             )
-        if self.nanny.role == 'P':
-            raise ValidationError(
-                {
-                    'nanny': "Nanny   cannot  to be parent"
-                }
-            )
+
+
+    @property
+    def calculate_days_worked(self):
+        # Count the number of unique dates the user worked
+        days_worked = self.dates.values('date').distinct().count()
+        return days_worked
+
+    @property
+    def calculate_total_hours_worked(self):
+        # Count the number of time slots and assume each slot represents 4 hours
+        total_hours_worked = self.dates.aggregate(total_slots=Count('time_slots'))['total_slots']
+
+        # Assuming 1 slot = 4 hours
+        total_hours_worked *= 4
+
+        return total_hours_worked
 
     def calculate_payment(self):
-        # Calculate payment based on user per hour price, days, and time slots
-        total_hours = 0
+        # Aggregate bookings based on date and time slots using Django ORM
+        aggregated_data = self.dates.values('date').annotate(
+            time_slots_count=Count('time_slots'),
+        )
 
-        for booking_date in self.dates.all():
-            days_difference = (booking_date.date - timezone.now().date()).days + 1
-            for time_slot in booking_date.time_slots.all():
-                # Adjust this line based on your TimeSlot model's actual structure
-                total_hours += time_slot.duration_in_hours if hasattr(time_slot, 'duration_in_hours') else 0
+        total_payment = 0
 
-        parent_hourly_price = self.parent.userprofile.amount_per_hour if self.parent.role == 'N' else 0
-        nanny_hourly_price = self.nanny.userprofile.amount_per_hour if self.nanny.role == 'P' else 0
+        for entry in aggregated_data:
+            if self.nanny.userprofile:
+                time_slots_count = entry['time_slots_count']
 
-        total_payment = total_hours * (parent_hourly_price + nanny_hourly_price)
+                # Assuming the duration is always 4 hours for both morning and evening time slots
+                total_hours = time_slots_count * 4
+
+                nanny_hourly_price = self.nanny.userprofile.amount_per_hour if self.nanny.role == 'N' else 0
+
+                entry_total_payment = total_hours * nanny_hourly_price
+                total_payment += entry_total_payment  # Accumulate the total payment for each entry
+            else:
+                raise ValidationError({'non_field_error': "Nanny has not set amount per hour."})
 
         return total_payment
 
-        return total_payment
+    @property
+    def total_amount(self):
+        """
+        calculate total amount nanny will be getting
+        """
+        return float(self.calculate_payment())
 
 
 class BookingDate(BaseModel):

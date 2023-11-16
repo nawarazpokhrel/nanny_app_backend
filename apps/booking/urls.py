@@ -19,7 +19,7 @@ urlpatterns = [
          name='accept-booking'
          ),
     path('history',
-         views.ListAcceptedBookingView.as_view(),
+         views.ListBookingHistoryView.as_view(),
          name='accept-booking'
          ),
     path('<int:booking_id>/review-add',

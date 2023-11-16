@@ -61,7 +61,6 @@ def filter_nannies(data):
     if data.get('has_work_permit'):
         queryset = queryset.filter(
             has_work_permit=data['has_work_permit'])
-        print(queryset)
     if data.get('has_first_aid_training'):
         queryset = queryset.filter(
             has_first_aid_training=data['has_first_aid_training'])

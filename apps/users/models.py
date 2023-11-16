@@ -42,6 +42,25 @@ class User(AbstractBaseUser, PermissionsMixin):
             return False
 
     @property
+    def has_paid(self):
+        from apps.payment.models import Payment
+
+        if Payment.objects.filter(to_be_paid_by=self).exists():
+            return True
+        return False
+
+    @property
+    def total_amount(self):
+        if self.role == "P":
+            from apps.booking.models import Booking
+            booking = Booking.objects.filter(parent=self, status="pending").first()
+            if booking:
+                return booking.calculate_payment()
+        else:
+            return None
+
+
+    @property
     def average_rating(self):
         from apps.booking.models import Review
 
@@ -96,7 +115,7 @@ class UserProfile(BaseModel):
         choices=Language.choices,
         null=True,
     )
-    address = models.CharField(null=True,blank=True)
+    address = models.CharField(null=True, blank=True)
     experience = models.ManyToManyField(Experience)
     postal_code = models.CharField(max_length=100, null=True, blank=True)
 
@@ -134,4 +153,3 @@ class UserAvailability(BaseModel):
     def __str__(self):
         time_slots = ", ".join([slot.name for slot in self.timeslots.all()])
         return f"{self.user_profile.user.fullname} -> {self.day.day_name} -> {time_slots}"
-
