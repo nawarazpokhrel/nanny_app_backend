@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Min
 
 from django.utils import timezone
 from apps.common.choices import RatingChoices
@@ -24,11 +24,11 @@ class Booking(BaseModel):
         ('rejected', 'Rejected'),
         ('completed', 'Completed')
     ]
+    has_paid = models.BooleanField(default=False)
     status = models.CharField(choices=STATUS_CHOICES, default='pending', max_length=10)
 
     def __str__(self):
         return f"Booking #{self.id} - {self.parent.fullname} to {self.nanny.fullname}"
-
 
     def clean(self):
         if self.parent:
@@ -45,17 +45,17 @@ class Booking(BaseModel):
                         'nanny': "Nanny   cannot  to be parent"
                     }
                 )
-        booking = Booking.objects.filter(
-            parent=self.parent,
-            nanny=self.nanny,
-            status='pending'
-        ).exists()
-        if booking:
-            raise ValidationError({
-                'status': 'Cannot make next booking until your request is accepted or rejected by this nanny.'
-            }
-            )
-
+        if self._state.adding:
+            booking = Booking.objects.filter(
+                parent=self.parent,
+                nanny=self.nanny,
+                status='pending'
+            ).exists()
+            if booking:
+                raise ValidationError({
+                    'status': 'Cannot make next booking until your request is accepted or rejected by this nanny.'
+                }
+                )
 
     @property
     def calculate_days_worked(self):
@@ -103,6 +103,18 @@ class Booking(BaseModel):
         calculate total amount nanny will be getting
         """
         return float(self.calculate_payment())
+
+    @property
+    def get_start_date(self):
+        # Find the minimum (earliest) booking date for accepted and paid bookings
+        min_booking_date = self.dates.filter(
+            booking__status='accepted',
+            booking__has_paid=False
+        ).order_by('date').first()
+        if min_booking_date:
+            return min_booking_date.date
+        else:
+            return None
 
 
 class BookingDate(BaseModel):

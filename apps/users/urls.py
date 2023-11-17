@@ -69,6 +69,14 @@ urlpatterns = [
          views.NannySearchView.as_view(),
          name='search-nanny'
          ),
+    path('change_phone_number',
+         views.ChangePhoneNumberView.as_view(),
+         name='change-phone-number'
+         ),
+    path('change-image',
+         views.ChangeProfileIMageView.as_view(),
+         name='change-image'
+         ),
 ]
 
 

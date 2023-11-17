@@ -1,8 +1,10 @@
+import base64
+
 from django.contrib.auth import get_user_model
 from rest_framework import generics, status
 from rest_framework import parsers
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -10,9 +12,9 @@ from apps.booking.models import Review
 from apps.booking.permissions import IsParent, IsNanny
 from apps.users import serializers, usecases
 from apps.users.filters import filter_nannies
-from apps.users.models import UserProfile
 from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer, \
-    AddToFavoritesSerializer, ListUserSerializer
+    AddToFavoritesSerializer, ChangePhoneNumberSerializer, ChangeImageSerializer
+from django.core.files.base import ContentFile
 
 User = get_user_model()
 
@@ -245,3 +247,33 @@ class RemoveFavoritesView(generics.CreateAPIView):
             "status": status.HTTP_201_CREATED
         }
         return Response(data)
+
+
+class ChangePhoneNumberView(generics.CreateAPIView):
+    queryset = ''
+    serializer_class = ChangePhoneNumberSerializer
+    permission_classes = [IsAuthenticated, ]
+
+    def perform_create(self, serializer):
+        phone_number = serializer.validated_data.get('phone_number', None)
+        user = User.objects.filter(phone_number=phone_number).first()
+        if user:
+            raise ValidationError({'error': 'User with this phone number already exists.'})
+        else:
+            self.request.user.phone_number = phone_number
+            self.request.user.save()
+
+
+class ChangeProfileIMageView(generics.CreateAPIView):
+    queryset = ''
+    serializer_class = ChangeImageSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def perform_create(self, serializer):
+        image = serializer.validated_data.get('avatar', None)
+        binary_data = base64.b64decode(image)
+        file_content = ContentFile(binary_data)
+        self.request.user.avatar.save(f'{self.request.user.fullname}_profile.jpg',
+                                      file_content,
+                                      )
+

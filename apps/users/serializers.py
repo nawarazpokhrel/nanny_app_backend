@@ -445,6 +445,14 @@ class UserPaymentSerializer(serializers.ModelSerializer):
             'has_paid',
             'total_amount'
         ]
-    def get_parent_detail(self, obj):
-        return ListUserSerializer(instance=obj.parent,context=self.context.get('request').__dict__).data
 
+    def get_parent_detail(self, obj):
+        return ListUserSerializer(instance=obj.parent, context=self.context.get('request').__dict__).data
+
+
+class ChangePhoneNumberSerializer(serializers.Serializer):
+    phone_number = serializers.CharField()
+
+
+class ChangeImageSerializer(serializers.Serializer):
+    avatar = serializers.CharField()

@@ -19,7 +19,7 @@ class Payment(BaseModel):
     to_be_paid_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return f"Payment for Booking #{self.booking.id} by {str(self.paid_by)}"
+        return f"Payment for Booking #{self.booking.id} by {str(self.to_be_paid_by)}"
 
     def clean(self):
         if self.paid_by.role != "P":

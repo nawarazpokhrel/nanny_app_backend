@@ -50,6 +50,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         return False
 
     @property
+    def amount_per_hour(self):
+        return self.userprofile.amount_per_hour
+
+    @property
     def total_amount(self):
         if self.role == "P":
             from apps.booking.models import Booking
