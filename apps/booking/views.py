@@ -185,7 +185,7 @@ class ListBookingHistoryView(ListAPIView):
         if full_name_search is not None and self.request.user.role == 'N':
             queryset = queryset.filter(parent__fullname__icontains=full_name_search)
             return queryset
-        if full_name_search  is not None and self.request.user.role == 'P':
+        if full_name_search is not None and self.request.user.role == 'P':
             queryset = queryset.filter(nanny__fullname__icontains=full_name_search)
             return queryset
         return queryset

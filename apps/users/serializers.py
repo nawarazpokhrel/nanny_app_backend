@@ -435,7 +435,7 @@ class UserPersonalProfileViaUserSerializer(serializers.ModelSerializer):
 class UserPaymentSerializer(serializers.ModelSerializer):
     parent_detail = serializers.SerializerMethodField()
     has_paid = serializers.BooleanField(source='parent.has_paid')
-    total_amount = serializers.FloatField(source='parent.total_amount')
+    total_amount = serializers.FloatField()
 
     class Meta:
         from apps.booking.models import Booking
