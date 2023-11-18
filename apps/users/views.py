@@ -10,10 +10,12 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.booking.models import Review
 from apps.booking.permissions import IsParent, IsNanny
+from apps.skills.models import Days, TimeSlot
 from apps.users import serializers, usecases
 from apps.users.filters import filter_nannies
+from apps.users.models import UserAvailability
 from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer, \
-    AddToFavoritesSerializer, ChangePhoneNumberSerializer, ChangeImageSerializer
+    AddToFavoritesSerializer, ChangePhoneNumberSerializer, ChangeImageSerializer, UserAvailabilitySerializer
 from django.core.files.base import ContentFile
 
 User = get_user_model()
@@ -292,3 +294,46 @@ class ChangeProfileIMageView(generics.CreateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response("Image saved successfully", status=status.HTTP_200_OK, headers=headers)
 
+
+class ChangeAvailabilityView(generics.CreateAPIView):
+    serializer_class = UserAvailabilitySerializer
+    permission_classes = [IsNanny]
+
+    def perform_create(self, serializer):
+        day = serializer.validated_data.get('day', None)
+        time_slots = serializer.validated_data.get('timeslots', None)
+        seen_slugs = set()
+        duplicate_slugs = set()
+
+        for timeslot in time_slots:
+            slug = timeslot["slug"]
+            if slug in seen_slugs:
+                duplicate_slugs.add(slug)
+            else:
+                seen_slugs.add(slug)
+        if duplicate_slugs:
+            raise ValidationError(
+                {'error': 'Error same time slot not permitted.'}
+            )
+        userprofile = self.request.user.userprofile
+        user_availabilities = UserAvailability.objects.filter(
+            day=day,
+            user_profile=userprofile
+        ).first()
+        if user_availabilities:
+            for time_slot_data in time_slots:
+                time_slot_name = time_slot_data.get('slug')
+                time_slot = TimeSlot.objects.filter(slug=time_slot_name).first()
+                if time_slot:
+                    user_availabilities.timeslots.add(time_slot)
+                else:
+                    raise ValidationError({
+                        'error': 'no timeslot found for following slug'
+                    })
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response("Time slot updated successfully", status=status.HTTP_201_CREATED, headers=headers)

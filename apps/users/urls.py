@@ -77,6 +77,10 @@ urlpatterns = [
          views.ChangeProfileIMageView.as_view(),
          name='change-image'
          ),
+    path('change-availabilty',
+         views.ChangeAvailabilityView.as_view(),
+         name='change-availabilty'
+         ),
 ]
 
 
