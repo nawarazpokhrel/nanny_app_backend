@@ -20,7 +20,7 @@ urlpatterns = [
          ),
     path('history',
          views.ListBookingHistoryView.as_view(),
-         name='accept-booking'
+         name='booking-history'
          ),
     path('<int:booking_id>/review-add',
          views.AddReviewView.as_view(),

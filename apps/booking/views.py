@@ -182,12 +182,13 @@ class ListBookingHistoryView(ListAPIView):
 
         # Apply search by parent's full name
         full_name_search = self.request.query_params.get('fullname', None)
-        if full_name_search and self.request.user.role == 'N':
+        if full_name_search is not None and self.request.user.role == 'N':
             queryset = queryset.filter(parent__fullname__icontains=full_name_search)
             return queryset
-        if (full_name_search and self.request.user.role == 'P'):
+        if full_name_search  is not None and self.request.user.role == 'P':
             queryset = queryset.filter(nanny__fullname__icontains=full_name_search)
             return queryset
+        return queryset
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

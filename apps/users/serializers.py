@@ -451,7 +451,15 @@ class UserPaymentSerializer(serializers.ModelSerializer):
 
 
 class ChangePhoneNumberSerializer(serializers.Serializer):
-    phone_number = serializers.CharField()
+    old_phone_number = serializers.CharField()
+    new_phone_number = serializers.CharField()
+
+    def validate(self, attrs):
+        if attrs.get('old_phone_number') == attrs.get('new_phone_number'):
+            raise serializers.ValidationError({
+                'error': 'Both phone numbers cannot be same'
+            })
+        return attrs
 
 
 class ChangeImageSerializer(serializers.Serializer):

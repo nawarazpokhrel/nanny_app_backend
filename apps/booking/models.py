@@ -73,6 +73,17 @@ class Booking(BaseModel):
 
         return total_hours_worked
 
+    @property
+    def has_reviewed(self):
+        if hasattr(self, 'review'):
+            return True
+        return False
+    @property
+    def has_payment_done(self):
+        if hasattr(self, 'payment'):
+            return True
+        return False
+
     def calculate_payment(self):
         # Aggregate bookings based on date and time slots using Django ORM
         aggregated_data = self.dates.values('date').annotate(

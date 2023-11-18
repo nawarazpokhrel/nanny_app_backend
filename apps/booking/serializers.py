@@ -41,6 +41,8 @@ class ListBookingSerializer(serializers.ModelSerializer):
     )
     booking_dates = BookingAvailabilitySerializer(source='dates', many=True)
     total_amount = serializers.FloatField()
+    has_reviewed = serializers.BooleanField()
+    has_payment_done = serializers.BooleanField()
 
     class Meta:
         model = Booking
@@ -54,7 +56,9 @@ class ListBookingSerializer(serializers.ModelSerializer):
             'commitment',
             'status',
             'booking_dates',
-            'total_amount'
+            'total_amount',
+            'has_reviewed',
+            'has_payment_done'
         ]
 
     def get_parent(self, obj):

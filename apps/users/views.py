@@ -255,12 +255,13 @@ class ChangePhoneNumberView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, ]
 
     def perform_create(self, serializer):
-        phone_number = serializer.validated_data.get('phone_number', None)
-        user = User.objects.filter(phone_number=phone_number).first()
-        if user:
-            raise ValidationError({'error': 'User with this phone number already exists.'})
+        old_phone_number = serializer.validated_data.get('old_phone_number', None)
+        new_phone_number = serializer.validated_data.get('new_phone_number', None)
+        user = User.objects.filter(phone_number=old_phone_number).first()
+        if not user:
+            raise ValidationError({'error': 'User does not exist for old phone number.'})
         else:
-            self.request.user.phone_number = phone_number
+            self.request.user.phone_number = new_phone_number
             self.request.user.save()
 
 
@@ -282,5 +283,12 @@ class ChangeProfileIMageView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response("Image saved successfully", status=status.HTTP_201_CREATED, headers=headers)
+        return Response("Phone Number updated successfully", status=status.HTTP_200_OK, headers=headers)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response("Image saved successfully", status=status.HTTP_200_OK, headers=headers)
 
