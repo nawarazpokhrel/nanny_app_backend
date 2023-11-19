@@ -5,8 +5,8 @@ from rest_framework.exceptions import ValidationError
 from apps.booking.models import Booking
 from apps.booking.permissions import IsParent
 from apps.payment import serializers
-from apps.payment.models import Payment
-from apps.payment.serializers import PaymentSerializer
+from apps.payment.models import Payment, PaymentMethod
+from apps.payment.serializers import PaymentSerializer, PaymentMethodSerializer
 
 
 # Create your views here.
@@ -62,3 +62,10 @@ class CreatePaymentView(generics.CreateAPIView):
             raise ValidationError({
                 'error': 'error payment already exists'
             })
+
+
+class PaymentMethodView(generics.ListAPIView):
+    serializer_class = PaymentMethodSerializer
+
+    def get_queryset(self):
+        return PaymentMethod.objects.all()

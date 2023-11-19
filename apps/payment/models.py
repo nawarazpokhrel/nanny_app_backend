@@ -1,13 +1,33 @@
 from django.db import models
 
 from apps.booking.models import Booking
+from apps.common.choices import PaymentChoices
 from apps.common.models import BaseModel
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
+from apps.common.utils import validate_file_size
+
 # Create your models here.
 User = get_user_model()
+
+
+class PaymentMethod(models.Model):
+    method = models.CharField(
+        max_length=20,
+        choices=PaymentChoices.choices,
+        default=PaymentChoices.CREDIT_CARD,
+        unique=True,
+    )
+    image = models.ImageField(validators=[validate_file_size], null=True)
+
+    def __str__(self):
+        return self.get_method_display()
+
+    @property
+    def payment_method(self):
+        return self.get_method_display()
 
 
 class Payment(BaseModel):
@@ -17,6 +37,7 @@ class Payment(BaseModel):
         ('uncompleted', 'Uncompleted'),
         ('completed', 'Completed')])
     to_be_paid_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    method = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"Payment for Booking #{self.booking.id} by {str(self.to_be_paid_by)}"

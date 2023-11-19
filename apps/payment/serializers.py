@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
 from apps.booking.models import Booking
+from apps.common.choices import PaymentChoices
+from apps.payment.models import PaymentMethod
 
 
 class ListPaymentSerializer(serializers.ModelSerializer):
@@ -26,5 +28,16 @@ class ListPaymentSerializer(serializers.ModelSerializer):
         ]
 
 
+class PaymentMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentMethod
+        fields = [
+            'method',
+            'image',
+            'payment_method'
+        ]
+
+
 class PaymentSerializer(serializers.Serializer):
     amount = serializers.FloatField()
+    method = serializers.ChoiceField(choices=PaymentChoices.choices)

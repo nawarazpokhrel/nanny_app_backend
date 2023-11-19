@@ -90,3 +90,12 @@ class Language(models.TextChoices):
     FRENCH = 'fr', 'French'
     GERMAN = 'de', 'German'
     CHINESE = 'zh', 'Chinese'
+
+
+class PaymentChoices(models.TextChoices):
+    CREDIT_CARD = 'credit_card', 'Credit Card'
+    DEBIT_CARD = 'debit_card', 'Debit Card'
+    PAYPAL = 'paypal', 'PayPal'
+    GOOGLE_PAY = 'google_pay', 'Google Pay'
+    APPLE_PAY = 'apple_pay', 'Apple Pay'
+    CASH = 'cash', 'Cash'
