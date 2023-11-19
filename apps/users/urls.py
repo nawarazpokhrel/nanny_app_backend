@@ -81,6 +81,10 @@ urlpatterns = [
          views.ChangeAvailabilityView.as_view(),
          name='change-availabilty'
          ),
+    path('check-phone_number',
+         views.CheckPhoneNumberView.as_view(),
+         name='check-phone-number'
+         ),
 ]
 
 

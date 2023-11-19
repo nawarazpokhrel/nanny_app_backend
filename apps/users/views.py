@@ -16,7 +16,8 @@ from apps.users import serializers, usecases
 from apps.users.filters import filter_nannies, UserFilterSet, FavouriteUserFilterSet
 from apps.users.models import UserAvailability
 from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer, \
-    AddToFavoritesSerializer, ChangePhoneNumberSerializer, ChangeImageSerializer, UserAvailabilitySerializer
+    AddToFavoritesSerializer, ChangePhoneNumberSerializer, ChangeImageSerializer, UserAvailabilitySerializer, \
+    CheckPhoneNumberSerializer
 
 User = get_user_model()
 
@@ -346,3 +347,25 @@ class ChangeAvailabilityView(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response("Time slot updated successfully", status=status.HTTP_201_CREATED, headers=headers)
+
+
+class CheckPhoneNumberView(generics.CreateAPIView):
+    serializer_class = CheckPhoneNumberSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        phone_number = serializer.validated_data.get('phone_number')
+        user = User.objects.filter(phone_number=phone_number).exists()
+        if user:
+            return Response({
+                "phone_number": phone_number,
+                "exists": True,
+            },
+                status=status.HTTP_201_CREATED,
+            )
+        else:
+            return Response({
+                "phone_number": phone_number,
+                "exists": False,
+            })

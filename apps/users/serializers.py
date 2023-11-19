@@ -464,3 +464,7 @@ class ChangePhoneNumberSerializer(serializers.Serializer):
 
 class ChangeImageSerializer(serializers.Serializer):
     avatar = serializers.CharField()
+
+
+class CheckPhoneNumberSerializer(serializers.Serializer):
+    phone_number = serializers.CharField()
