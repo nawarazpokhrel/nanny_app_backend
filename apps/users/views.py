@@ -1,8 +1,9 @@
 import base64
 
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
-from rest_framework import parsers
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -10,13 +11,12 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.booking.models import Review
 from apps.booking.permissions import IsParent, IsNanny
-from apps.skills.models import Days, TimeSlot
+from apps.skills.models import TimeSlot
 from apps.users import serializers, usecases
-from apps.users.filters import filter_nannies
+from apps.users.filters import filter_nannies, UserFilterSet, FavouriteUserFilterSet
 from apps.users.models import UserAvailability
 from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer, \
     AddToFavoritesSerializer, ChangePhoneNumberSerializer, ChangeImageSerializer, UserAvailabilitySerializer
-from django.core.files.base import ContentFile
 
 User = get_user_model()
 
@@ -98,6 +98,9 @@ class CreateUserProfileView(generics.CreateAPIView):
 
 class ListUserPersonalDetailView(generics.ListAPIView):
     serializer_class = UserPersonalDetailSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = UserFilterSet
+    permission_classes = [IsParent, ]
 
     def get_queryset(self):
         return User.objects.filter(role='N')
@@ -172,10 +175,16 @@ class AddToFavoritesView(generics.CreateAPIView):
 
 class ListFavoritesView(generics.ListAPIView):
     serializer_class = serializers.UserPersonalProfileViaUserSerializer
+    filter_backends = [DjangoFilterBackend, ]
+    filterset_class = FavouriteUserFilterSet
     permission_classes = [IsParent]
 
     def get_queryset(self):
-        return self.request.user.favorites.filter(role='N').all().order_by('-id')
+        queryset = self.request.user.favorites.filter(role='N').all().order_by('-id')
+        full_name_search = self.request.query_params.get('fullname', None)
+        if full_name_search:
+            queryset = queryset.filter(fullname__icontains=full_name_search)
+        return queryset
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

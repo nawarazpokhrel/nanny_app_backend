@@ -3,8 +3,9 @@ from datetime import date, timedelta
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils import timezone
+from django_filters import rest_framework as filters
 
-from apps.common.choices import UserRole
+from apps.common.choices import UserRole, CanadaCity
 from apps.users.models import UserProfile
 
 User = get_user_model()
@@ -72,3 +73,18 @@ def filter_nannies(data):
             has_nanny_training=data['has_nanny_training'])
 
     return queryset
+
+
+class UserFilterSet(filters.FilterSet):
+    fullname = filters.CharFilter(lookup_expr='icontains')
+    city = filters.ChoiceFilter(choices=CanadaCity.choices, field_name='userprofile__city')
+
+    class Meta:
+        fields = ['fullname', 'city']
+
+
+class FavouriteUserFilterSet(filters.FilterSet):
+    fullname = filters.CharFilter(lookup_expr='icontains')
+
+    class Meta:
+        fields = ['fullname']

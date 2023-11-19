@@ -1,12 +1,13 @@
-from django.shortcuts import render
+from django.db import IntegrityError
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
+
 from apps.booking.models import Booking
 from apps.booking.permissions import IsParent
 from apps.payment import serializers
 from apps.payment.models import Payment
 from apps.payment.serializers import PaymentSerializer
-from django.db import IntegrityError
+
 
 # Create your views here.
 class ListPaymentDetailView(generics.ListAPIView):
@@ -59,5 +60,5 @@ class CreatePaymentView(generics.CreateAPIView):
             instance.save()
         except IntegrityError:
             raise ValidationError({
-                'error':'error payment already exists'
+                'error': 'error payment already exists'
             })
