@@ -259,3 +259,22 @@ class ListMyReviewView(ListAPIView):
         context['request'] = self.request
         context['class'] = "MyReview"
         return context
+
+
+class CancelBookingView(generics.DestroyAPIView):
+    permission_classes = [IsParent]
+
+    def get_object(self):
+        booking = Booking.objects.filter(pk=self.kwargs.get('booking_id')).first()
+        if booking:
+            return booking
+        else:
+            raise ValidationError({'error': 'Booking does not exist for following id.'})
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response("Booking has been cancelled and deleted successfully.", status=status.HTTP_204_NO_CONTENT)
