@@ -165,11 +165,8 @@ class ListBookingHistoryView(ListAPIView):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = BookingFilter
 
-    def get_serializer_class(self):
-        if self.request.user.role == 'P':
-            return ListBookingSerializer
-        elif self.request.user.role == 'N':
-            return UserPaymentSerializer
+    serializer_class = ListBookingSerializer
+
 
     def get_queryset(self):
         queryset = Booking.objects.filter(status__in=['accepted', 'rejected', 'pending'])

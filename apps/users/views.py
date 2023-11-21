@@ -327,10 +327,10 @@ class ChangeAvailabilityView(generics.CreateAPIView):
                 {'error': 'Error same time slot not permitted.'}
             )
         userprofile = self.request.user.userprofile
-        user_availabilities = UserAvailability.objects.filter(
+        user_availabilities, created = UserAvailability.objects.get_or_create(
             day=day,
             user_profile=userprofile
-        ).first()
+        )
         if user_availabilities:
             for time_slot_data in time_slots:
                 time_slot_name = time_slot_data.get('slug')

@@ -435,7 +435,7 @@ class UserPersonalProfileViaUserSerializer(serializers.ModelSerializer):
 
 class UserPaymentSerializer(serializers.ModelSerializer):
     parent_detail = serializers.SerializerMethodField()
-    has_paid = serializers.BooleanField(source='parent.has_paid')
+    has_paid = serializers.SerializerMethodField()
     total_amount = serializers.FloatField()
 
     class Meta:

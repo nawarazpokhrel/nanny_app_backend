@@ -58,7 +58,7 @@ class ListBookingSerializer(serializers.ModelSerializer):
             'booking_dates',
             'total_amount',
             'has_reviewed',
-            'has_payment_done'
+            'has_payment_done',
         ]
 
     def get_parent(self, obj):
@@ -66,6 +66,9 @@ class ListBookingSerializer(serializers.ModelSerializer):
 
     def get_nanny(self, obj):
         return UserPersonalDetailSerializer(instance=obj.nanny, context=self.context).data
+
+    def get_has_paid(self, obj):
+        print(self.context)
 
 
 class AcceptBookingSerializer(serializers.ModelSerializer):
