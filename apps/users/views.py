@@ -110,7 +110,7 @@ class ListUserPersonalDetailView(generics.ListAPIView):
 
 class UserPersonalDetailView(generics.RetrieveAPIView):
     serializer_class = UserPersonalDetailSerializer
-    permission_classes = [IsParent]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         user_id = self.kwargs.get('user_id')
@@ -375,10 +375,11 @@ class CheckPhoneNumberView(generics.CreateAPIView):
 
 class RegisterUserDeviceView(generics.CreateAPIView):
     serializer_class = RegisterUserDeviceSerializer
+    permission_classes = [  IsAuthenticated]
 
     def perform_create(self, serializer):
         data = serializer.validated_data
-        user = User.objects.filter(pk=data.get('user_id')).first()
+        user = User.objects.filter(pk=self.request.user).first()
         if user:
             device, created = FCMDevice.objects.get_or_create(
                 registration_id=data.get('token'),

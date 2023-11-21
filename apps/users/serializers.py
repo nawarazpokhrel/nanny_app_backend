@@ -472,5 +472,4 @@ class CheckPhoneNumberSerializer(serializers.Serializer):
 
 
 class RegisterUserDeviceSerializer(serializers.Serializer):
-    user_id = serializers.CharField()
     token = serializers.CharField()
