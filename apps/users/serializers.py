@@ -469,3 +469,8 @@ class ChangeImageSerializer(serializers.Serializer):
 
 class CheckPhoneNumberSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
+
+
+class RegisterUserDeviceSerializer(serializers.Serializer):
+    user_id = serializers.CharField()
+    token = serializers.CharField()

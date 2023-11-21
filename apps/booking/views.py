@@ -1,19 +1,19 @@
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError, transaction
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
-from django.db import IntegrityError, transaction
 
 from apps.booking import serializers
 from apps.booking.filters import BookingFilter
 from apps.booking.models import BookingDate, Booking, Review
 from apps.booking.permissions import IsNanny, IsParent
 from apps.booking.serializers import ListBookingSerializer, AcceptBookingSerializer
-from apps.skills.models import TimeSlot, Availability
-from apps.users.serializers import ListReviewSerializer, UserPaymentSerializer
+from apps.skills.models import TimeSlot
+from apps.users.serializers import ListReviewSerializer
 
 User = get_user_model()
 
@@ -166,7 +166,6 @@ class ListBookingHistoryView(ListAPIView):
     filterset_class = BookingFilter
 
     serializer_class = ListBookingSerializer
-
 
     def get_queryset(self):
         queryset = Booking.objects.filter(status__in=['accepted', 'rejected', 'pending'])

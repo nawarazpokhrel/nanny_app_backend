@@ -85,9 +85,8 @@ urlpatterns = [
          views.CheckPhoneNumberView.as_view(),
          name='check-phone-number'
          ),
+    path('register-device',
+         views.RegisterUserDeviceView.as_view(),
+         name='register-user-device'
+         ),
 ]
-
-
-
-
-# {commitment_type: [1, 2], gender: M, date_of_birth: 2005-11-09, country: CA, address: Van, experience: [1, 2], amount_per_hour: 10, postal_code: 123, skills: [1, 2], has_work_permit: true, work_permit_pr: Instance of 'MultipartFile', bio: Testing Bio, availability: [{day: 1, timeslots: [{slug: morning}, {slug: afternoon}, {slug: evening}, {slug: night}]}, {day: 2, timeslots: [{slug: morning}, {slug: night}]}, {day: 6, timeslots: [{slug: morning}, {slug: night}]}]}

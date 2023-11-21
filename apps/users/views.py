@@ -17,7 +17,8 @@ from apps.users.filters import filter_nannies, UserFilterSet, FavouriteUserFilte
 from apps.users.models import UserAvailability
 from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer, \
     AddToFavoritesSerializer, ChangePhoneNumberSerializer, ChangeImageSerializer, UserAvailabilitySerializer, \
-    CheckPhoneNumberSerializer
+    CheckPhoneNumberSerializer, RegisterUserDeviceSerializer
+from fcm_django.models import FCMDevice
 
 User = get_user_model()
 
@@ -369,4 +370,21 @@ class CheckPhoneNumberView(generics.CreateAPIView):
             return Response({
                 "phone_number": phone_number,
                 "exists": False,
+            })
+
+
+class RegisterUserDeviceView(generics.CreateAPIView):
+    serializer_class = RegisterUserDeviceSerializer
+
+    def perform_create(self, serializer):
+        data = serializer.validated_data
+        user = User.objects.filter(pk=data.get('user_id')).first()
+        if user:
+            device, created = FCMDevice.objects.get_or_create(
+                registration_id=data.get('token'),
+                user=user
+            )
+        else:
+            raise ValidationError({
+                'error': 'error user doesnot exist.'
             })

@@ -67,7 +67,8 @@ THIRD_PARTY_APPS = [
     'drf_spectacular',
     'drf_spectacular_sidecar',
     'corsheaders',
-    'django_filters'
+    'django_filters',
+    'fcm_django',
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -131,7 +132,7 @@ DATABASES = {
         'NAME': env('DB_NAME'),  # Your database name
         'USER': env('DB_USER'),  # Your database username
         'PASSWORD': env('DB_PASSWORD'),  # Replace with your actual database password
-        'HOST':  env('DB_HOST'),
+        'HOST': env('DB_HOST'),
         'PORT': '5432',
         'OPTIONS': {
             'sslmode': 'require',
@@ -255,3 +256,6 @@ CORS_ALLOW_METHODS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = '/app/media/'
+FCM_DJANGO_SETTINGS = {
+    "FCM_SERVER_KEY": env('FCM_SERVER_KEY'),
+}
