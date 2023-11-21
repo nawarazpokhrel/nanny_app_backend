@@ -169,7 +169,7 @@ class ListBookingHistoryView(ListAPIView):
         if self.request.user.role == 'P':
             return ListBookingSerializer
         elif self.request.user.role == 'N':
-            return ListBookingSerializer
+            return UserPaymentSerializer
 
     def get_queryset(self):
         queryset = Booking.objects.filter(status__in=['accepted', 'rejected', 'pending'])
