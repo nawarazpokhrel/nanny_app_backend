@@ -379,7 +379,7 @@ class RegisterUserDeviceView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         data = serializer.validated_data
-        user = User.objects.filter(pk=self.request.user).first()
+        user = User.objects.filter(pk=self.request.user.id).first()
         if user:
             device, created = FCMDevice.objects.get_or_create(
                 registration_id=data.get('token'),
