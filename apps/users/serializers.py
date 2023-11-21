@@ -103,10 +103,11 @@ class ListReviewSerializer(serializers.ModelSerializer):
         ]
 
     def get_user(self, obj):
+        # print(self.context,"hi"*100
         if self.context.get('class') == 'MyReview':
             return ListUserSerializer(instance=obj.user, context=self.context.get('request').__dict__).data
         else:
-            return ListUserSerializer(instance=obj.user, context=self.context.__dict__).data
+            return ListUserSerializer(instance=obj.user, context=self.context).data
 
 
 class CreateProfileSerializer(serializers.ModelSerializer):
@@ -275,7 +276,7 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
 
     def get_review(self, obj):
         reviews = self.context.get('reviews', [])
-        return ListReviewSerializer(reviews, many=True, context=self.context.get('request')).data
+        return ListReviewSerializer(reviews, many=True, context=self.context.get('request').__dict__).data
 
     def get_has_been_favorite(self, obj):
         user_id = (self.context.get('user_id'))
