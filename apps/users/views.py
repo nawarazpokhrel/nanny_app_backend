@@ -109,6 +109,7 @@ class ListUserPersonalDetailView(generics.ListAPIView):
 
 class UserPersonalDetailView(generics.RetrieveAPIView):
     serializer_class = UserPersonalDetailSerializer
+    permission_classes = [IsParent]
 
     def get_object(self):
         user_id = self.kwargs.get('user_id')
