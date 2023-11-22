@@ -60,6 +60,7 @@ LOCAL_APPS = [
     'apps.skills',
     'apps.booking',
     'apps.payment',
+    'apps.notification',
 ]
 
 THIRD_PARTY_APPS = [
@@ -259,3 +260,12 @@ MEDIA_ROOT = '/app/media/'
 FCM_DJANGO_SETTINGS = {
     "FCM_SERVER_KEY": env('FCM_SERVER_KEY'),
 }
+
+
+
+import firebase_admin
+from firebase_admin import credentials
+
+# Initialize Firebase Admin SDK
+cred = credentials.Certificate("serviceAccountKey.json")  # Replace with the path to your service account key file
+firebase_admin.initialize_app(cred)
