@@ -17,7 +17,7 @@ from apps.users.filters import filter_nannies, UserFilterSet, FavouriteUserFilte
 from apps.users.models import UserAvailability, Device
 from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer, \
     AddToFavoritesSerializer, ChangePhoneNumberSerializer, ChangeImageSerializer, UserAvailabilitySerializer, \
-    CheckPhoneNumberSerializer, RegisterUserDeviceSerializer
+    CheckPhoneNumberSerializer, RegisterUserDeviceSerializer, ChangepasswordSerializer
 from fcm_django.models import FCMDevice
 
 User = get_user_model()
@@ -375,7 +375,7 @@ class CheckPhoneNumberView(generics.CreateAPIView):
 
 class RegisterUserDeviceView(generics.CreateAPIView):
     serializer_class = RegisterUserDeviceSerializer
-    permission_classes = [  IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         data = serializer.validated_data
@@ -389,3 +389,32 @@ class RegisterUserDeviceView(generics.CreateAPIView):
             raise ValidationError({
                 'error': 'error user doesnot exist.'
             })
+
+
+class ChangePassswordView(generics.CreateAPIView):
+    serializer_class = ChangepasswordSerializer
+
+    def perform_create(self, serializer):
+        phone_number = serializer.validated_data.get('phone_number')
+        user = User.objects.filter(phone_number=phone_number).first()
+        password = serializer.validated_data.pop('password')
+        if user:
+            user.set_password(password)
+            user.save()
+        else:
+            raise ValidationError(
+                {
+                    'error': 'user doesnot exist.'
+                }
+            )
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            "password changed successfully",
+            status=status.HTTP_200_OK,
+            headers=headers
+        )

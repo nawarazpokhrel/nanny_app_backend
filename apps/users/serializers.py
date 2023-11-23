@@ -489,3 +489,8 @@ class CheckPhoneNumberSerializer(serializers.Serializer):
 
 class RegisterUserDeviceSerializer(serializers.Serializer):
     token = serializers.CharField()
+
+
+class ChangepasswordSerializer(serializers.Serializer):
+    phone_number = serializers.CharField()
+    password = serializers.CharField(write_only=True)

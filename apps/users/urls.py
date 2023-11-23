@@ -85,6 +85,10 @@ urlpatterns = [
          views.CheckPhoneNumberView.as_view(),
          name='check-phone-number'
          ),
+    path('change-password',
+         views.ChangePassswordView.as_view(),
+         name='change-password'
+         ),
     path('register-device',
          views.RegisterUserDeviceView.as_view(),
          name='register-user-device'
