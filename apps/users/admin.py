@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
 from apps.users.forms import UserChangeForm, UserCreationForm
-from apps.users.models import User, UserProfile, UserAvailability
+from apps.users.models import User, UserProfile, UserAvailability, Device
 
 
 # Register your models here.
@@ -42,3 +42,4 @@ class UserAdmin(BaseUserAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(UserProfile)
 admin.site.register(UserAvailability)
+admin.site.register(Device)

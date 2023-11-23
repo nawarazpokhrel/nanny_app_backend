@@ -14,7 +14,7 @@ from apps.booking.permissions import IsParent, IsNanny
 from apps.skills.models import TimeSlot
 from apps.users import serializers, usecases
 from apps.users.filters import filter_nannies, UserFilterSet, FavouriteUserFilterSet
-from apps.users.models import UserAvailability
+from apps.users.models import UserAvailability, Device
 from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer, \
     AddToFavoritesSerializer, ChangePhoneNumberSerializer, ChangeImageSerializer, UserAvailabilitySerializer, \
     CheckPhoneNumberSerializer, RegisterUserDeviceSerializer
@@ -381,7 +381,7 @@ class RegisterUserDeviceView(generics.CreateAPIView):
         data = serializer.validated_data
         user = User.objects.filter(pk=self.request.user.id).first()
         if user:
-            device, created = FCMDevice.objects.get_or_create(
+            device, created = Device.objects.get_or_create(
                 registration_id=data.get('token'),
                 user=user
             )

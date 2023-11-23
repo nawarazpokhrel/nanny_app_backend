@@ -157,3 +157,11 @@ class UserAvailability(BaseModel):
     def __str__(self):
         time_slots = ", ".join([slot.name for slot in self.timeslots.all()])
         return f"{self.user_profile.user.fullname} -> {self.day.day_name} -> {time_slots}"
+
+
+class Device(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    registration_id = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return str(self.user.fullname)

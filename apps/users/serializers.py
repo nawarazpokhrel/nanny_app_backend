@@ -259,6 +259,7 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
     has_user_profile = serializers.BooleanField()
     review = serializers.SerializerMethodField()
     has_been_favorite = serializers.SerializerMethodField()
+    has_been_booked = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -268,7 +269,8 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
             'review',
             'review_stats',
             'has_user_profile',
-            'has_been_favorite'
+            'has_been_favorite',
+            'has_been_booked'
         ]
 
     def get_user_detail(self, obj):
@@ -286,6 +288,20 @@ class UserPersonalDetailSerializer(serializers.ModelSerializer):
             if user in requesting_user.favorites.all():
                 return True
         return False
+
+    def get_has_been_booked(self, obj):
+        from apps.booking.models import Booking
+        user_id = (self.context.get('user_id'))
+        requesting_user = (self.context.get('requesting_user'))
+        user = User.objects.filter(id=user_id).first()
+        if Booking.objects.filter(
+                parent=requesting_user,
+                nanny=user,
+                status='pending'
+        ).exists():
+            return True
+        else:
+            return False
 
     def get_review_stats(self, obj):
         reviews = self.context.get('reviews', [])
