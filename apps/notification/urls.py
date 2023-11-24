@@ -7,5 +7,5 @@ urlpatterns = [
         'list',
         NotificationListView.as_view(),
         name='notification-list'
-    )
+    ),
 ]
