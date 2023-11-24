@@ -83,8 +83,7 @@ class RequestForPaymentView(APIView):
 
     def post(self, request, *args, **kwargs):
         kwargs = kwargs.get('booking_id')
-        print(kwargs)
-        booking = Booking.objects.filter(pk=kwargs).first()
+        booking = Booking.objects.filter(pk=kwargs, nanny=self.request.user).first()
 
         if booking:
             if booking.status == 'accepted':
@@ -124,6 +123,6 @@ class RequestForPaymentView(APIView):
                     'error': 'Payment request cannot be be made when booking is not accepted by you.'
                 })
         else:
-            raise ValidationError({'error': 'Booking does not exist'})
+            raise ValidationError({'error': 'Booking does not exist or this booking has been set to another nanny'})
 
         return Response('Payment request has been initiated')
