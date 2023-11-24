@@ -377,18 +377,36 @@ class RegisterUserDeviceView(generics.CreateAPIView):
     serializer_class = RegisterUserDeviceSerializer
     permission_classes = [IsAuthenticated]
 
+    """
+    registration id -> if exists delete whole device  and create new device
+    """
+
     def perform_create(self, serializer):
         data = serializer.validated_data
         user = User.objects.filter(pk=self.request.user.id).first()
         if user:
-            device, created = Device.objects.get_or_create(
+            device = Device.objects.filter(
                 registration_id=data.get('token'),
-                user=user
-            )
+            ).first()
+            if device:
+                device.delete()
+            else:
+                Device.objects.create(user=user, registration_id=data.get('token'))
         else:
             raise ValidationError({
                 'error': 'error user doesnot exist.'
             })
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            "device registered  successfully",
+            status=status.HTTP_200_OK,
+            headers=headers
+        )
 
 
 class ChangePassswordView(generics.CreateAPIView):

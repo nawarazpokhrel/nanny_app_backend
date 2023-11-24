@@ -84,7 +84,6 @@ class RequestForPaymentView(APIView):
     def post(self, request, *args, **kwargs):
         kwargs = kwargs.get('booking_id')
         booking = Booking.objects.filter(pk=kwargs, nanny=self.request.user).first()
-
         if booking:
             if booking.status == 'accepted':
                 parent_device = Device.objects.filter(user=booking.parent).first()
