@@ -88,10 +88,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         else:
             return None
 
-    def clean(self):
-        # Validate that a nanny cannot add favorites
-        if self.role == UserRole.NANNY and self.favorites.exists():
-            raise ValidationError("Nannies cannot add favorites.")
+    # def clean(self):
+    #     # Validate that a nanny cannot add favorites
+    #     if self.role == UserRole.NANNY and self.favorites.exists():
+    #         raise ValidationError("Nannies cannot add favorites.")
 
 
 class UserProfile(BaseModel):
