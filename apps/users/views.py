@@ -11,19 +11,14 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from apps.booking.models import Review
 from apps.booking.permissions import IsParent, IsNanny
-from apps.pyotp.mixins import OTPMixin
-from apps.pyotp.models import PyOTP
 from apps.skills.models import TimeSlot
 from apps.users import serializers, usecases
 from apps.users.filters import filter_nannies, UserFilterSet, FavouriteUserFilterSet
 from apps.users.models import UserAvailability, Device
 from apps.users.serializers import CreateProfileSerializer, UserPersonalDetailSerializer, MyTokenObtainPairSerializer, \
     AddToFavoritesSerializer, ChangePhoneNumberSerializer, ChangeImageSerializer, UserAvailabilitySerializer, \
-    CheckPhoneNumberSerializer, RegisterUserDeviceSerializer, ChangepasswordSerializer, VerifyUserOTPSerializer, \
-    ResendUserOTPSerializer
+    CheckPhoneNumberSerializer, RegisterUserDeviceSerializer, ChangepasswordSerializer
 from fcm_django.models import FCMDevice
-
-from nanny_backend import settings
 
 User = get_user_model()
 
@@ -438,58 +433,6 @@ class ChangePassswordView(generics.CreateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response(
             "password changed successfully",
-            status=status.HTTP_200_OK,
-            headers=headers
-        )
-
-
-class VerifyOTPView(generics.CreateAPIView, OTPMixin):
-    serializer_class = VerifyUserOTPSerializer
-
-    def perform_create(self, serializer):
-        code = serializer.validated_data.get('code')
-        email = serializer.validated_data.get('email')
-        user = User.objects.filter(email=email).first()
-        if user:
-            is_code_valid = self.verify_otp_for_user(user, code, 'A')
-            if is_code_valid:
-                user = user
-                user.is_active = True
-                user.save()
-            else:
-                raise ValidationError(
-                    {
-                        'error': 'Otp expired.'
-                    }
-                )
-        else:
-            raise ValidationError({"error": "no user for following email id"})
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            "User verified successfully",
-            status=status.HTTP_200_OK,
-            headers=headers
-        )
-
-
-class ResendOTPView(generics.CreateAPIView):
-    serializer_class = ResendUserOTPSerializer
-
-    def perform_create(self, serializer):
-        return usecases.ResendOTPUsecase(serializer=serializer).execute()
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            "Otp resent successfully",
             status=status.HTTP_200_OK,
             headers=headers
         )

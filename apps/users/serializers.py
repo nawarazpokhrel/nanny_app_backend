@@ -23,7 +23,6 @@ class CreateUserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'phone_number',
-            'email',
             'fullname',
             'role',
             'password'
@@ -495,12 +494,3 @@ class RegisterUserDeviceSerializer(serializers.Serializer):
 class ChangepasswordSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
     password = serializers.CharField(write_only=True)
-
-
-class ResendUserOTPSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-
-
-class VerifyUserOTPSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    code = serializers.CharField(max_length=6)

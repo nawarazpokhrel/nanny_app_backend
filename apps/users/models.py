@@ -16,7 +16,6 @@ from apps.users.managers import CustomUserManager
 # Create your models here.
 class User(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=15, unique=True)
-    email = models.EmailField(null=True)
     fullname = models.CharField(_('full name'), max_length=255, blank=True, null=True)
     avatar = models.ImageField(null=True, blank=True, default='arthik_default_user.jpeg',
                                validators=[validate_file_size])

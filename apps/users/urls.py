@@ -93,12 +93,4 @@ urlpatterns = [
          views.RegisterUserDeviceView.as_view(),
          name='register-user-device'
          ),
-    path('verify-otp',
-         views.VerifyOTPView.as_view(),
-         name='verify-user-otp'
-         ),
-    path('resend-otp',
-         views.ResendOTPView.as_view(),
-         name='resend-user-otp'
-         ),
 ]
