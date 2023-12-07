@@ -20,7 +20,6 @@ env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False)
 )
-
 # Set the project base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -61,6 +60,7 @@ LOCAL_APPS = [
     'apps.booking',
     'apps.payment',
     'apps.notification',
+    'apps.pyotp',
 ]
 
 THIRD_PARTY_APPS = [
@@ -87,10 +87,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'nanny_backend.urls'
 
+SETTINGS_PATH = os.path.dirname(os.path.dirname(__file__))
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(SETTINGS_PATH, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -261,11 +263,17 @@ FCM_DJANGO_SETTINGS = {
     "FCM_SERVER_KEY": env('FCM_SERVER_KEY'),
 }
 
-
-
 import firebase_admin
 from firebase_admin import credentials
 
 # Initialize Firebase Admin SDK
 cred = credentials.Certificate("serviceAccountKey.json")  # Replace with the path to your service account key file
 firebase_admin.initialize_app(cred)
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+OTP_INTERVAL = 180
