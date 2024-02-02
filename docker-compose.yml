@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nanny_backend
+    ports:
+      - "8002:8002"
+    env_file:
+      - .env  # Specify the path to your .env file
+    depends_on:
+      - db
+    links:
+      - db
+    volumes:
+      - media_volume:/app/media
+
+  db:
+    image: postgres:latest
+    container_name: nanny_backend_db
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+volumes:
+  media_volume:

@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
 from apps.users.forms import UserChangeForm, UserCreationForm
-from apps.users.models import User
+from apps.users.models import User, UserProfile, UserAvailability, Device
 
 
 # Register your models here.
@@ -26,7 +26,7 @@ class UserAdmin(BaseUserAdmin):
 
     fieldsets = (
         (None, {'fields': ('phone_number', 'password')}),
-        (_('Personal info'), {'fields': ('fullname', 'role')}),
+        (_('Personal info'), {'fields': ('fullname', 'role', 'avatar', 'favorites')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                        'groups', 'user_permissions')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
@@ -40,3 +40,6 @@ class UserAdmin(BaseUserAdmin):
 
 
 admin.site.register(User, UserAdmin)
+admin.site.register(UserProfile)
+admin.site.register(UserAvailability)
+admin.site.register(Device)
